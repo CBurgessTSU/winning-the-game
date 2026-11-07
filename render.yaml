@@ -1,0 +1,14 @@
+# Render blueprint for the tiny AI service.
+# When you create the service from this repo, Render reads this file and
+# pre-fills everything. You only need to paste your API key (see below).
+services:
+  - type: web
+    name: tsu-trader-tools-ai
+    runtime: node
+    plan: free
+    buildCommand: echo "no build needed — zero dependencies"
+    startCommand: node server.js
+    envVars:
+      # Paste your real key in the Render dashboard (kept out of git on purpose).
+      - key: ANTHROPIC_API_KEY
+        sync: false

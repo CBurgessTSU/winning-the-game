@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeSmart University — Trader Tools</title>
+<meta name="description" content="A set of tools for TradeSmart University students: the 4 Levers of Profitability calculator, the Mindset Assessment Worksheet, and 10 Conversations to Change Your Trading.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER / NAV ═══════════════════════ -->
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="#top" aria-label="TradeSmart University home">
+      <!-- Drop the real logo in here later: replace this block with
+           <img src="assets/tsu-logo.svg" alt="TradeSmart University"> -->
+      <span class="wordmark-mark" aria-hidden="true">T</span>
+      <span class="wordmark-text"><span class="wm-grad">TradeSmart</span><span class="wm-uni">University</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Tools">
+      <a href="#levers">4 Levers Calculator</a>
+      <a href="#mindset">Mindset Assessment</a>
+      <a href="#conversations">10 Conversations</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobile-nav" hidden>
+    <a href="#levers">4 Levers Calculator</a>
+    <a href="#mindset">Mindset Assessment</a>
+    <a href="#conversations">10 Conversations</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ═══════════════════════ HERO ═══════════════════════ -->
+  <section class="hero">
+    <div class="shell">
+      <p class="eyebrow">TSU Trader Tools</p>
+      <h1 class="hero-title">Same account.<br>Same number of setups.</h1>
+      <div class="hero-swing" aria-hidden="false">
+        <div class="swing-figure">
+          <span class="swing-label">A year like this</span>
+          <span class="swing-amount is-low">$384</span>
+        </div>
+        <div class="swing-arrow" aria-hidden="true">
+          <svg viewBox="0 0 48 24" width="48" height="24" fill="none"><path d="M2 12h40m0 0-8-8m8 8-8 8" stroke="url(#swingGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="swingGrad" x1="0" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#38BDF8"/><stop offset="0.5" stop-color="#60A5FA"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs></svg>
+        </div>
+        <div class="swing-figure">
+          <span class="swing-label">or a year like this</span>
+          <span class="swing-amount is-high">$1,544</span>
+        </div>
+      </div>
+      <p class="hero-sub">The difference isn't the market. It's four levers you already control — how often you trade, how often you win, how much you make when you win, and how much you give back when you lose. Set your real numbers below and watch what small, believable changes do.</p>
+      <a class="btn btn-primary" href="#levers">Start with the 4 Levers</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ TOOL 1 — 4 LEVERS CALCULATOR ═══════════════════════ -->
+  <section class="tool" id="levers">
+    <div class="shell">
+      <header class="tool-head">
+        <p class="eyebrow">Tool 01</p>
+        <h2 class="tool-title">4 Levers of Profitability Calculator</h2>
+        <p class="tool-lede">Enter where you are today, set small improvement targets, and see the multiplied result. Then build a plan and commit to it.</p>
+      </header>
+
+      <!-- Mode toggle -->
+      <div class="mode-toggle" role="radiogroup" aria-label="Calculation mode">
+        <button class="mode-btn is-active" data-mode="percent" role="radio" aria-checked="true">% Returns</button>
+        <button class="mode-btn" data-mode="r" role="radio" aria-checked="false">R-Values</button>
+      </div>
+
+      <!-- Phase 1 + 2: Baseline | Targets -->
+      <div class="calc-grid">
+
+        <!-- BASELINE COLUMN -->
+        <div class="calc-col" id="baseline-col">
+          <div class="col-head">
+            <span class="stage-chip stage-measure">Measure</span>
+            <h3>Where you are now</h3>
+          </div>
+
+          <div class="field">
+            <label for="in-trades">Number of Trades</label>
+            <p class="field-hint">How many setups you take in a period (a month, or your last 10–20 trades).</p>
+            <input type="number" id="in-trades" inputmode="numeric" min="0" step="1" placeholder="e.g. 16">
+          </div>
+
+          <div class="field" data-mode-field="value">
+            <label for="in-value">
+              <span class="lbl-percent">Average Trade Value <span class="unit">($)</span></span>
+              <span class="lbl-r">
+                Your R <span class="unit">($)</span>
+                <button type="button" class="info" aria-label="What is R?" data-tip="Your R is the maximum dollar amount you risk on a single trade. In the TSU system, R is 1% of your account value.">i</button>
+              </span>
+            </label>
+            <p class="field-hint lbl-percent">The typical dollar size of one position.</p>
+            <p class="field-hint lbl-r">The most you risk on any one trade.</p>
+            <input type="number" id="in-value" inputmode="decimal" min="0" step="any" placeholder="e.g. 1000">
+          </div>
+
+          <div class="field">
+            <label for="in-wins">Winning Trades <span class="unit">(#)</span></label>
+            <p class="field-hint">How many of those trades closed as wins. Losses fill in automatically.</p>
+            <input type="number" id="in-wins" inputmode="numeric" min="0" step="1" placeholder="e.g. 11">
+            <div class="derived-row" id="winloss-derived" hidden>
+              <div class="derived"><span class="derived-label">Losing Trades</span><span class="derived-val" id="out-losses">—</span></div>
+              <div class="derived"><span class="derived-label">Win %</span><span class="derived-val" id="out-winpct">—</span></div>
+              <div class="derived"><span class="derived-label">Loss %</span><span class="derived-val" id="out-losspct">—</span></div>
+            </div>
+          </div>
+
+          <div class="field" data-mode-field="win">
+            <label for="in-win-return">
+              <span class="lbl-percent">Average Winner <span class="unit">(% of trade value)</span></span>
+              <span class="lbl-r">Average Winner <span class="unit">(R multiple)</span></span>
+            </label>
+            <p class="field-hint lbl-percent">What a typical winning trade gains, as a % of the position.</p>
+            <p class="field-hint lbl-r">What a typical winner makes, measured in R. (1.3 means you make 1.3× what you risked.)</p>
+            <input type="number" id="in-win-return" inputmode="decimal" min="0" step="any" placeholder="e.g. 18">
+          </div>
+
+          <div class="field" data-mode-field="loss">
+            <label for="in-loss-return">
+              <span class="lbl-percent">Average Loss <span class="unit">(% of trade value)</span></span>
+              <span class="lbl-r">Average Loss <span class="unit">(R multiple)</span></span>
+            </label>
+            <p class="field-hint lbl-percent">What a typical losing trade gives back, as a % of the position.</p>
+            <p class="field-hint lbl-r">What a typical loss costs, in R. Your target is 1.0R — your loss should equal your R, no more.</p>
+            <input type="number" id="in-loss-return" inputmode="decimal" min="0" step="any" placeholder="e.g. 30">
+            <p class="field-warn" id="loss-warn" hidden>Your average loss is above 1.2R. Tighter stops keep losses at your R.</p>
+          </div>
+
+          <div class="field" data-mode-field="commissions">
+            <label for="in-commissions">Commissions <span class="unit">($ total, optional)</span></label>
+            <p class="field-hint">Total commissions across all those trades. Leave blank if none.</p>
+            <input type="number" id="in-commissions" inputmode="decimal" min="0" step="any" placeholder="e.g. 96">
+          </div>
+
+          <!-- Current P&L -->
+          <div class="pnl-box pnl-current">
+            <span class="pnl-tag">Your result now</span>
+            <div class="pnl-figures">
+              <div class="pnl-stat">
+                <span class="pnl-label">Profit</span>
+                <span class="pnl-val" id="out-current-profit">—</span>
+              </div>
+              <div class="pnl-stat">
+                <span class="pnl-label" id="current-secondary-label">ROI</span>
+                <span class="pnl-val" id="out-current-secondary">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARGETS COLUMN -->
+        <div class="calc-col calc-col-targets is-locked" id="targets-col">
+          <div class="col-head">
+            <span class="stage-chip stage-goal">Goal</span>
+            <h3>Where you could be</h3>
+          </div>
+
+          <div class="locked-note" id="targets-locked-note">
+            <p>Fill in your current numbers on the left, then set small improvement targets here. Even a few points on each lever add up.</p>
+          </div>
+
+          <div class="targets-body" id="targets-body" hidden>
+            <div class="field target-field">
+              <label for="tg-trades">Number of Trades <span class="unit">(change)</span></label>
+              <p class="field-hint">Taking fewer, higher-quality setups is often the improvement. Use a minus to trade less.</p>
+              <div class="target-input"><span class="target-sign">±</span><input type="number" id="tg-trades" inputmode="numeric" step="1" placeholder="e.g. -1"><span class="target-result" id="tg-trades-result"></span></div>
+            </div>
+
+            <div class="field target-field">
+              <label for="tg-winpct">Win-Loss Ratio <span class="unit">(+ points to win %)</span></label>
+              <p class="field-hint">Even +4 points to your win rate makes a large difference.</p>
+              <div class="target-input"><span class="target-sign">+</span><input type="number" id="tg-winpct" inputmode="decimal" step="any" placeholder="e.g. 4"><span class="target-result" id="tg-winpct-result"></span></div>
+            </div>
+
+            <div class="field target-field" data-mode-field="win">
+              <label for="tg-win">
+                <span class="lbl-percent">Average Winner <span class="unit">(+ % points)</span></span>
+                <span class="lbl-r">Average Winner <span class="unit">(+ R)</span></span>
+              </label>
+              <p class="field-hint">Holding winners a little longer lifts this.</p>
+              <div class="target-input"><span class="target-sign">+</span><input type="number" id="tg-win" inputmode="decimal" step="any" placeholder="e.g. 6"><span class="target-result" id="tg-win-result"></span></div>
+            </div>
+
+            <div class="field target-field" data-mode-field="loss">
+              <label for="tg-loss">
+                <span class="lbl-percent">Average Loss <span class="unit">(− % points)</span></span>
+                <span class="lbl-r">Average Loss <span class="unit">(− R)</span></span>
+              </label>
+              <p class="field-hint">Cutting losers sooner shrinks this. Use a minus to reduce it.</p>
+              <div class="target-input"><span class="target-sign">±</span><input type="number" id="tg-loss" inputmode="decimal" step="any" placeholder="e.g. -5"><span class="target-result" id="tg-loss-result"></span></div>
+            </div>
+
+            <!-- Projected P&L -->
+            <div class="pnl-box pnl-projected">
+              <span class="pnl-tag">Your projected result</span>
+              <div class="pnl-figures">
+                <div class="pnl-stat">
+                  <span class="pnl-label">Projected Profit</span>
+                  <span class="pnl-val" id="out-projected-profit">—</span>
+                </div>
+                <div class="pnl-stat">
+                  <span class="pnl-label" id="projected-secondary-label">ROI</span>
+                  <span class="pnl-val" id="out-projected-secondary">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THE WOW MOMENT -->
+      <div class="wow" id="wow" hidden>
+        <div class="wow-inner">
+          <p class="wow-label">Your profit improvement</p>
+          <div class="wow-number" id="wow-number">0%</div>
+          <p class="wow-caption">Small improvements in each lever create a multiplied result.</p>
+        </div>
+      </div>
+
+      <!-- TIME IN TRADE -->
+      <div class="time-in-trade" id="time-in-trade" hidden>
+        <div class="section-divider"><span>Time in Trade</span></div>
+        <p class="tit-intro">This one doesn't change the profit above — it shows how moving faster lets you run your edge more times a year. Optional.</p>
+        <div class="tit-inputs">
+          <div class="field">
+            <label for="tit-current">Current average days in a trade</label>
+            <input type="number" id="tit-current" inputmode="decimal" min="0" step="any" placeholder="e.g. 8">
+          </div>
+          <div class="field">
+            <label for="tit-target">Target average days in a trade</label>
+            <input type="number" id="tit-target" inputmode="decimal" min="0" step="any" placeholder="e.g. 4">
+          </div>
+        </div>
+        <div class="tit-results" id="tit-results" hidden>
+          <div class="tit-stat-row">
+            <div class="tit-stat">
+              <span class="tit-stat-label">Cycles per year now</span>
+              <span class="tit-stat-val" id="tit-current-cycles">—</span>
+            </div>
+            <div class="tit-stat tit-stat-up">
+              <span class="tit-stat-label">Cycles per year improved</span>
+              <span class="tit-stat-val" id="tit-projected-cycles">—</span>
+            </div>
+          </div>
+          <div class="tit-stat-row">
+            <div class="tit-stat">
+              <span class="tit-stat-label">Annual potential now</span>
+              <span class="tit-stat-val" id="tit-current-annual">—</span>
+            </div>
+            <div class="tit-stat tit-stat-up">
+              <span class="tit-stat-label">Annual potential improved</span>
+              <span class="tit-stat-val" id="tit-projected-annual">—</span>
+            </div>
+          </div>
+          <p class="tit-narrative" id="tit-narrative"></p>
+          <div class="callout">
+            <p><strong>The 3-Day Rule:</strong> if a trade hasn't moved in your favor within 3 trading days, exit. Capital tied up in a stalled trade is capital that can't be deployed elsewhere. Faster recycling isn't just efficiency — it's compounding your edge.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CIRCLE OF PROGRESS -->
+      <div class="circle-of-progress" id="circle-of-progress" hidden>
+        <div class="section-divider"><span>The Circle of Progress</span></div>
+        <div class="cop-wrap">
+          <div class="cop-graphic" id="cop-graphic" aria-hidden="true"></div>
+          <div class="cop-copy">
+            <p class="cop-line">You've <strong>measured</strong> your baseline and set your <strong>goal</strong>. Now let's build your <strong>plan</strong>.</p>
+            <p class="cop-sub">This isn't a one-time exercise. Trade the plan, measure again, and correct — the loop is the work.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI RECOMMENDATIONS + COMMITMENTS -->
+      <div class="plan-section" id="plan-section" hidden>
+        <div class="section-divider"><span>Build your plan</span></div>
+        <div class="plan-intro">
+          <p>Get specific, process-based recommendations for the levers you're improving — in Josh's voice, grounded in the TSU method — then write what you'll actually do.</p>
+          <button class="btn btn-primary" id="generate-plan">Generate my plan</button>
+        </div>
+
+        <div class="plan-status" id="plan-status" hidden></div>
+
+        <div class="lever-cards" id="lever-cards"></div>
+
+        <div class="plan-footer" id="plan-footer" hidden>
+          <div class="comeback">
+            <p><strong>Come back.</strong> Run this tool again after your next 10–20 trades to measure your improvement and start the next cycle.</p>
+          </div>
+          <button class="btn btn-secondary" id="copy-plan">Copy my commitment card</button>
+          <span class="copy-feedback" id="copy-feedback" hidden>Copied to your clipboard.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ TOOL 2 — MINDSET ASSESSMENT (placeholder) ═══════════════════════ -->
+  <section class="tool tool-placeholder" id="mindset">
+    <div class="shell">
+      <header class="tool-head">
+        <p class="eyebrow">Tool 02</p>
+        <h2 class="tool-title">Mindset Assessment Worksheet</h2>
+        <p class="tool-lede">An interactive worksheet to examine the needs, beliefs, values, and personal rules shaping your trading decisions — so you can see the patterns for yourself.</p>
+      </header>
+      <div class="placeholder-card">
+        <span class="placeholder-badge">In development</span>
+        <p>This tool is being built from Josh's specification. It will live right here on this page.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ TOOL 3 — 10 CONVERSATIONS (placeholder) ═══════════════════════ -->
+  <section class="tool tool-placeholder" id="conversations">
+    <div class="shell">
+      <header class="tool-head">
+        <p class="eyebrow">Tool 03</p>
+        <h2 class="tool-title">10 Conversations to Change Your Trading</h2>
+        <p class="tool-lede">Ten custom prompts for Josh-Bot that help surface the hidden psychological patterns behind your trading decisions.</p>
+      </header>
+      <div class="placeholder-card">
+        <span class="placeholder-badge">In development</span>
+        <p>This guide is being built from Josh's specification. It will live right here on this page.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <span class="footer-mark"><span class="wm-grad">TradeSmart</span> University</span>
+    <span class="footer-note">Trader Tools · For TSU students</span>
+  </div>
+</footer>
+
+<!-- Tooltip bubble (shared) -->
+<div class="tip-bubble" id="tip-bubble" role="tooltip" hidden></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/levers.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

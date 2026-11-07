@@ -1,0 +1,11 @@
+# secrets
+.env
+.env.local
+
+# internal source docs (spec, brand guide, mockup) — not for the public repo
+sources/
+
+# os / editor junk
+.DS_Store
+*.log
+node_modules/

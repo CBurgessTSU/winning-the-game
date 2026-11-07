@@ -1,0 +1,13 @@
+{
+  "name": "tsu-trader-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TSU class tools microsite — 4 Levers Calculator (+ placeholders) with a tiny zero-dependency AI service.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
