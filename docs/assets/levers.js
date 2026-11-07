@@ -9,6 +9,17 @@
   var cfg = window.TSU_CONFIG || { aiBaseUrl: '' };
   var TRADING_DAYS = 252;
 
+  // Where the AI service lives. If aiBaseUrl is set, use it (points the page at
+  // a service on another host). If it's blank, the service is the same server
+  // that delivered this page — the normal setup on Render — so use this origin.
+  // Returns '' only when the page was opened from a file (no server, AI off).
+  function aiBase() {
+    var v = cfg.aiBaseUrl && String(cfg.aiBaseUrl).trim();
+    if (v) return v.replace(/\/$/, '');
+    if (location.protocol === 'http:' || location.protocol === 'https:') return location.origin;
+    return '';
+  }
+
   /* ---------- state (kept separately per mode) ---------- */
   function blankInputs() { return { trades: '', value: '', wins: '', winReturn: '', lossReturn: '', commissions: '' }; }
   function blankTargets() { return { trades: '', winpct: '', win: '', loss: '' }; }
@@ -288,14 +299,14 @@
       status.hidden = false; status.className = 'plan-status'; status.textContent = 'Set at least one improvement target above to build a plan.';
       return;
     }
-    var base = cfg.aiBaseUrl && String(cfg.aiBaseUrl).trim();
+    var base = aiBase();
     if (!base) { renderPlan(null, levers, 'off'); return; }
 
     btn.disabled = true;
     status.hidden = false; status.className = 'plan-status';
     status.innerHTML = '<span class="spinner"></span>Writing your plan…';
 
-    fetch(base.replace(/\/$/, '') + '/api/plan', {
+    fetch(base + '/api/plan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildStudentData())

@@ -1,13 +1,16 @@
-# Render blueprint for the tiny AI service.
+# Render blueprint for the TSU Trader Tools app.
+# This one service hosts BOTH the website (the docs/ folder) and the AI
+# endpoints — everything runs together on one always-on instance.
 # When you create the service from this repo, Render reads this file and
 # pre-fills everything. You only need to paste your API key (see below).
 services:
   - type: web
-    name: tsu-trader-tools-ai
+    name: tsu-trader-tools
     runtime: node
-    plan: free
+    plan: starter            # $7/mo, always on (no sleep, no cold starts)
     buildCommand: echo "no build needed — zero dependencies"
     startCommand: node server.js
+    healthCheckPath: /api/health
     envVars:
       # Paste your real key in the Render dashboard (kept out of git on purpose).
       - key: ANTHROPIC_API_KEY

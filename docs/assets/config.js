@@ -1,20 +1,20 @@
 /* ───────────────────────────────────────────────────────────────
    TSU Trader Tools — site configuration
 
-   This is the ONLY file you edit to turn the AI feature on.
+   aiBaseUrl: where the AI service lives.
 
-   aiBaseUrl: the web address of your Render AI service.
-     • Leave it as "" (empty) for now. The 4 Levers calculator works
-       fully without it — the "Generate my plan" button just shows a
-       friendly "write your own plan" message.
-     • Once the Render service is deployed, paste its URL here, e.g.
+     • Leave it as "" (empty) for the normal setup. The site and the AI
+       service run together on one Render service, so the page finds the
+       AI automatically on whatever address serves it — your Render URL
+       or your custom domain. No edit needed when the domain changes.
+
+     • Only set this if you ever host the AI service on a DIFFERENT
+       address than the website, e.g.
          aiBaseUrl: "https://tsu-tools-ai.onrender.com"
-       Save, re-deploy the page, and the AI turns on. No code changes.
 
-   When aiBaseUrl is set, the page will:
-     1. ping <aiBaseUrl>/api/health on load to wake the free Render
-        service, so it's ready by the time a student clicks the button;
-     2. send plan requests to <aiBaseUrl>/api/plan.
+   The 4 Levers calculator always works, with or without the AI. If the
+   AI service can't be reached, the "Generate my plan" button simply
+   shows "write your own plan" boxes instead.
    ─────────────────────────────────────────────────────────────── */
 window.TSU_CONFIG = {
   aiBaseUrl: ""

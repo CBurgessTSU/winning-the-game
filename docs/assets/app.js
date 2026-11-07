@@ -1,11 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════
-   Site-level behavior: nav, tooltips, Circle of Progress,
-   and the Render warm-up heartbeat.
+   Site-level behavior: nav, tooltips, Circle of Progress.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var cfg = window.TSU_CONFIG || { aiBaseUrl: '' };
 
   /* ---------- mobile nav ---------- */
   function initNav() {
@@ -93,45 +91,7 @@
     });
   }
 
-  /* ---------- Render warm-up heartbeat ---------- */
-  function initWarmup() {
-    var base = cfg.aiBaseUrl && String(cfg.aiBaseUrl).trim();
-    if (!base) return;                       // AI not configured yet — nothing to warm
-    var url = base.replace(/\/$/, '') + '/api/health';
-    var INTERVAL = 10 * 60 * 1000;           // ping every 10 min
-    var ACTIVE_WINDOW = 14 * 60 * 1000;      // only if interacted within last 14 min
-    var EVENT_THROTTLE = 3 * 60 * 1000;      // plan-visible re-ping no more than every 3 min
-    var lastActivity = Date.now();
-    var lastEventPing = 0;
-
-    function ping() {
-      try { fetch(url, { method: 'GET', mode: 'cors', cache: 'no-store', keepalive: true }).catch(function () {}); }
-      catch (e) { /* ignore — warm-up is best-effort */ }
-    }
-
-    ['pointerdown', 'keydown', 'input', 'scroll', 'touchstart'].forEach(function (ev) {
-      window.addEventListener(ev, function () { lastActivity = Date.now(); }, { passive: true });
-    });
-
-    ping();  // initial wake on load
-
-    setInterval(function () {
-      if (document.visibilityState === 'hidden') return;          // tab not in view → let it sleep
-      if (Date.now() - lastActivity < ACTIVE_WINDOW) ping();      // only while actively used
-    }, INTERVAL);
-
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'visible') { lastActivity = Date.now(); ping(); }
-    });
-
-    // extra insurance: when the plan section first reveals, make sure it's warm
-    document.addEventListener('tsu:plan-visible', function () {
-      var now = Date.now();
-      if (now - lastEventPing > EVENT_THROTTLE) { lastEventPing = now; ping(); }
-    });
-  }
-
-  function init() { initNav(); initScrollSpy(); initTooltips(); initCircle(); initWarmup(); }
+  function init() { initNav(); initScrollSpy(); initTooltips(); initCircle(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
