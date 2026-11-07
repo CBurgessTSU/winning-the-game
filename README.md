@@ -1,4 +1,4 @@
-# TSU Trader Tools
+# Winning The Game
 
 A single-page microsite hosting custom tools for a TradeSmart University class:
 
@@ -86,7 +86,7 @@ This repo includes a `render.yaml` blueprint, so Render pre-fills the settings.
 4. Under **Environment**, add:
    - `ANTHROPIC_API_KEY` = your Anthropic key
    - *(optional)* `CLAUDE_MODEL` = a different model (see below)
-5. Deploy. Render gives you a URL like `https://tsu-trader-tools.onrender.com`.
+5. Deploy. Render gives you a URL like `https://winning-the-game.onrender.com`.
    The full site and the AI button are live at that URL immediately.
 
 Every push to the `main` branch redeploys the service automatically.

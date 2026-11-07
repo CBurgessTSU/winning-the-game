@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   TSU Trader Tools — tiny AI service (zero dependencies)
+   Winning The Game — site + AI service (zero dependencies)
 
    This is the ONLY part of the project that needs a server. It does two jobs:
 
@@ -325,6 +325,6 @@ var server = http.createServer(function (req, res) {
 });
 
 server.listen(PORT, function () {
-  console.log('TSU Trader Tools server listening on http://localhost:' + PORT);
+  console.log('Winning The Game server listening on http://localhost:' + PORT);
   console.log('  AI feature: ' + (API_KEY ? 'ON (model ' + MODEL + ')' : 'OFF — set ANTHROPIC_API_KEY to enable'));
 });

@@ -1,5 +1,5 @@
 /* ───────────────────────────────────────────────────────────────
-   TSU Trader Tools — site configuration
+   Winning The Game — site configuration
 
    aiBaseUrl: where the AI service lives.
 
