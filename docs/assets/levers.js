@@ -1,6 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   4 Levers of Profitability — calculator engine + UI
+   4 Levers of Profitability — calculator engine + 3-step wizard
    All math verified against Josh's worksheet examples (see build spec).
+   The compute functions below are unchanged; the UI around them is a
+   three-screen wizard: Baseline → Targets → Plan.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -30,6 +32,7 @@
   var mode = 'percent';
   var commitments = {};   // keyed by lever name, so recalcs don't lose typed text
   var lastPlan = null;    // last AI response (or fallback marker)
+  var lastPlanSig = null; // signature of inputs the current plan was built from
 
   var inEls = { trades: 'in-trades', value: 'in-value', wins: 'in-wins', winReturn: 'in-win-return', lossReturn: 'in-loss-return', commissions: 'in-commissions' };
   var tgEls = { trades: 'tg-trades', winpct: 'tg-winpct', win: 'tg-win', loss: 'tg-loss' };
@@ -45,7 +48,7 @@
   function rMult(n) { if (n === null || isNaN(n)) return '—'; return (Math.round(n * 10) / 10).toFixed(1) + 'R'; }
   function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
 
-  /* ---------- math ---------- */
+  /* ---------- math (verified — do not change) ---------- */
   // Returns a computed baseline object, or null if required inputs are missing.
   function computeBaseline(m, i) {
     var trades = num(i.trades), value = num(i.value), wins = num(i.wins),
@@ -105,8 +108,9 @@
   function hasAnyTarget(t) {
     return [t.trades, t.winpct, t.win, t.loss].some(function (v) { var n = num(v); return n !== null && n !== 0; });
   }
+  function fmtUnit(v, unit) { if (v === null || v === undefined) return '—'; var n = Math.round(v * 10) / 10; return (unit === 'R') ? n.toFixed(1) + 'R' : n + '%'; }
 
-  /* ---------- read inputs into state ---------- */
+  /* ---------- read / write fields <-> state ---------- */
   function readFields() {
     var d = data[mode];
     Object.keys(inEls).forEach(function (k) { var el = $(inEls[k]); if (el) d.inputs[k] = el.value; });
@@ -118,18 +122,33 @@
     Object.keys(tgEls).forEach(function (k) { var el = $(tgEls[k]); if (el) el.value = d.targets[k]; });
   }
 
+  /* ---------- improvement value (shared by wow + summary) ---------- */
+  // Returns {val, usePct} or null. Percentage when currently profitable,
+  // otherwise the raw dollar gain.
+  function improvement(base, proj) {
+    if (!base || !proj) return null;
+    var curP = base.profit, projP = proj.profit;
+    var usePct = curP > 0;
+    var val = usePct ? Math.round((projP - curP) / Math.abs(curP) * 100) : (projP - curP);
+    return { val: val, usePct: usePct };
+  }
+  function fmtImprovement(imp) { if (!imp) return '—'; return imp.usePct ? (imp.val + '%') : ('+' + money(imp.val)); }
+
   /* ---------- the main recompute + render ---------- */
   function update() {
     readFields();
     var d = data[mode];
     var base = computeBaseline(mode, d.inputs);
+    var proj = base ? computeProjected(mode, base, d.targets) : null;
+    var secLabel = mode === 'percent' ? 'ROI' : 'Total R';
+    var secOf = function (o) { return o ? (mode === 'percent' ? pct(o.roi) : rMult(o.totalR)) : '—'; };
+    var unit = mode === 'percent' ? '%' : 'R';
 
-    // Loss > 1.2R warning (R mode only)
-    var lossWarn = $('loss-warn');
+    /* — Step 1: loss warning (R mode only) — */
     var lrVal = num(d.inputs.lossReturn);
-    lossWarn.hidden = !(mode === 'r' && lrVal !== null && lrVal > 1.2);
+    $('loss-warn').hidden = !(mode === 'r' && lrVal !== null && lrVal > 1.2);
 
-    // Derived row
+    /* — Step 1: derived win/loss row — */
     var derivedRow = $('winloss-derived');
     if (base) {
       derivedRow.hidden = false;
@@ -140,75 +159,58 @@
       derivedRow.hidden = true;
     }
 
-    // Current P&L
-    if (base) {
-      $('out-current-profit').textContent = money(base.profit);
-      if (mode === 'percent') { $('current-secondary-label').textContent = 'ROI'; $('out-current-secondary').textContent = pct(base.roi); }
-      else { $('current-secondary-label').textContent = 'Total R'; $('out-current-secondary').textContent = rMult(base.totalR); }
-    } else {
-      $('out-current-profit').textContent = '—';
-      $('out-current-secondary').textContent = '—';
-      $('current-secondary-label').textContent = mode === 'percent' ? 'ROI' : 'Total R';
-    }
+    /* — Step 1: current result bar — */
+    $('s1-sec-label').textContent = secLabel;
+    $('s1-profit').textContent = base ? money(base.profit) : '—';
+    $('s1-sec').textContent = secOf(base);
 
-    // Targets column unlock
-    var targetsCol = $('targets-col'), targetsBody = $('targets-body');
-    if (base) { targetsCol.classList.remove('is-locked'); targetsBody.hidden = false; }
-    else { targetsCol.classList.add('is-locked'); targetsBody.hidden = true; }
+    /* — Step 1: enable / disable the "continue" button — */
+    var toTargets = $('to-targets'), bHint = $('baseline-hint');
+    if (toTargets) toTargets.disabled = !base;
+    if (bHint) bHint.hidden = !!base;
 
-    // Projected
-    var proj = base ? computeProjected(mode, base, d.targets) : null;
-    var engaged = base && hasAnyTarget(d.targets) && proj;
+    /* — Step 2: per-lever comparison (now → projected) — */
+    setCmp('trades', base ? String(base.trades) : '—', proj ? String(proj.trades) : '—');
+    setCmp('winpct', base ? pct(base.winPct, 0) : '—', proj ? pct(proj.winPct, 0) : '—');
+    setCmp('win', base ? fmtUnit(base.winReturn, unit) : '—', proj ? fmtUnit(proj.winReturn, unit) : '—');
+    setCmp('loss', base ? fmtUnit(base.lossReturn, unit) : '—', proj ? fmtUnit(proj.lossReturn, unit) : '—');
 
-    if (proj) {
-      $('out-projected-profit').textContent = money(proj.profit);
-      if (mode === 'percent') { $('projected-secondary-label').textContent = 'ROI'; $('out-projected-secondary').textContent = pct(proj.roi); }
-      else { $('projected-secondary-label').textContent = 'Total R'; $('out-projected-secondary').textContent = rMult(proj.totalR); }
-    } else {
-      $('out-projected-profit').textContent = '—';
-      $('out-projected-secondary').textContent = '—';
-    }
+    /* — Step 2: before / after profit + wow number (no celebratory animation on keystroke) — */
+    $('s2-current-profit').textContent = base ? money(base.profit) : '—';
+    $('s2-projected-profit').textContent = proj ? money(proj.profit) : '—';
+    renderWow(base, proj, false);
 
-    // Target inline results (current → projected)
-    renderTargetResult('tg-trades-result', d.targets.trades, base && base.trades, proj && proj.trades);
-    renderTargetResult('tg-winpct-result', d.targets.winpct, base && pct(base.winPct, 0), proj && pct(proj.winPct, 0));
-    var unit = mode === 'percent' ? '%' : 'R';
-    renderTargetResult('tg-win-result', d.targets.win, base && fmtUnit(base.winReturn, unit), proj && fmtUnit(proj.winReturn, unit));
-    renderTargetResult('tg-loss-result', d.targets.loss, base && fmtUnit(base.lossReturn, unit), proj && fmtUnit(proj.lossReturn, unit));
+    /* — Step 2: time in trade — */
+    updateTimeInTrade(base, proj);
 
-    // Reveal wow / time-in-trade / circle / plan
-    toggleReveal(engaged, base, proj);
+    /* — Step 3: summary bar — */
+    $('s3-current-profit').textContent = base ? money(base.profit) : '—';
+    $('s3-projected-profit').textContent = proj ? money(proj.profit) : '—';
+    $('s3-improvement').textContent = fmtImprovement(improvement(base, proj));
 
-    // Time in Trade (needs projected profit)
-    updateTimeInTrade(base, proj, engaged);
+    /* — Step 2: enable / disable the "build plan" button — */
+    var toPlan = $('to-plan'), tHint = $('targets-hint');
+    var ready = base && hasAnyTarget(d.targets);
+    if (toPlan) toPlan.disabled = !ready;
+    if (tHint) tHint.hidden = !!ready;
   }
 
-  function fmtUnit(v, unit) { if (v === null || v === undefined) return '—'; var n = Math.round(v * 10) / 10; return (unit === 'R') ? n.toFixed(1) + 'R' : n + '%'; }
-
-  function renderTargetResult(id, raw, cur, proj) {
-    var el = $(id); if (!el) return;
-    var n = num(raw);
-    if (n === null || n === 0 || cur === null || cur === false || proj === null || proj === false) { el.innerHTML = ''; return; }
-    el.innerHTML = cur + ' <span class="arrow">→</span> <span class="to">' + proj + '</span>';
+  function setCmp(key, nowTxt, projTxt) {
+    var a = $('cmp-' + key + '-now'), b = $('cmp-' + key + '-proj');
+    if (a) a.textContent = nowTxt;
+    if (b) b.textContent = projTxt;
   }
 
-  /* ---------- reveal / wow ---------- */
+  /* ---------- wow number ---------- */
   var wowShownValue = null;
-  function toggleReveal(engaged, base, proj) {
-    var wow = $('wow'), tit = $('time-in-trade'), cop = $('circle-of-progress'), plan = $('plan-section');
-    if (engaged) {
-      if (wow.hidden) { wow.hidden = false; }
-      tit.hidden = false; cop.hidden = false; plan.hidden = false;
-      // improvement value
-      var curP = base.profit, projP = proj.profit;
-      var usePct = curP > 0;
-      var val = usePct ? Math.round((projP - curP) / Math.abs(curP) * 100) : (projP - curP);
-      if (val !== wowShownValue) { animateWow(val, usePct); wowShownValue = val; }
-      document.dispatchEvent(new CustomEvent('tsu:plan-visible'));
-    } else {
-      wow.hidden = true; tit.hidden = true; cop.hidden = true; plan.hidden = true;
-      wowShownValue = null;
-    }
+  function renderWow(base, proj, animate) {
+    var el = $('wow-number'); if (!el) return;
+    var imp = improvement(base, proj);
+    if (!imp) { el.textContent = '0%'; wowShownValue = null; return; }
+    if (animate) { animateWow(imp.val, imp.usePct); wowShownValue = imp.val; return; }
+    // instant update as the student tweaks targets
+    el.textContent = imp.usePct ? (Math.round(imp.val) + '%') : ('+' + money(imp.val));
+    wowShownValue = imp.val;
   }
 
   function animateWow(target, usePct) {
@@ -228,9 +230,9 @@
   }
 
   /* ---------- Time in Trade ---------- */
-  function updateTimeInTrade(base, proj, engaged) {
+  function updateTimeInTrade(base, proj) {
     var results = $('tit-results');
-    if (!engaged) { results.hidden = true; return; }
+    if (!base || !proj) { results.hidden = true; return; }
     var cur = num($('tit-current').value), tgt = num($('tit-target').value);
     if (cur === null || cur <= 0 || tgt === null || tgt <= 0) { results.hidden = true; return; }
     results.hidden = false;
@@ -292,19 +294,27 @@
   }
 
   /* ---------- AI plan ---------- */
+  function planSignature() {
+    var d = data[mode];
+    return JSON.stringify({ mode: mode, inputs: d.inputs, targets: d.targets,
+      tit: [$('tit-current').value, $('tit-target').value] });
+  }
+
   function generatePlan() {
-    var btn = $('generate-plan'), status = $('plan-status');
+    var status = $('plan-status');
     var levers = targetedLevers();
     if (!levers.length) {
-      status.hidden = false; status.className = 'plan-status'; status.textContent = 'Set at least one improvement target above to build a plan.';
+      status.hidden = false; status.className = 'plan-status'; status.textContent = 'Set at least one improvement target to build a plan.';
       return;
     }
+    lastPlanSig = planSignature();
     var base = aiBase();
     if (!base) { renderPlan(null, levers, 'off'); return; }
 
-    btn.disabled = true;
     status.hidden = false; status.className = 'plan-status';
     status.innerHTML = '<span class="spinner"></span>Writing your plan…';
+    $('lever-cards').innerHTML = '';
+    $('plan-footer').hidden = true;
 
     fetch(base + '/api/plan', {
       method: 'POST',
@@ -319,7 +329,7 @@
     }).catch(function () {
       status.hidden = true;
       renderPlan(null, levers, 'error');
-    }).then(function () { btn.disabled = false; });
+    });
   }
 
   function renderPlan(plan, levers, state) {
@@ -459,6 +469,58 @@
     update();
   }
 
+  /* ═══════════════════ wizard navigation ═══════════════════ */
+  var currentScreen = 1;
+  var SCREENS = { 1: 'screen-baseline', 2: 'screen-targets', 3: 'screen-plan' };
+
+  function baselineReady() { return !!computeBaseline(mode, data[mode].inputs); }
+
+  function goToScreen(n) {
+    readFields();
+    // guards (also flash the relevant hint)
+    if (n >= 2 && !baselineReady()) { flashHint('baseline-hint'); return; }
+    if (n >= 3 && !hasAnyTarget(data[mode].targets)) { flashHint('targets-hint'); return; }
+
+    currentScreen = n;
+    Object.keys(SCREENS).forEach(function (k) { $(SCREENS[k]).hidden = (Number(k) !== n); });
+    updateStepper(n);
+    var mt = $('mode-toggle'); if (mt) mt.hidden = (n === 3);
+
+    if (n === 2) { update(); renderWow(computeBaseline(mode, data[mode].inputs), computeProjected(mode, computeBaseline(mode, data[mode].inputs), data[mode].targets), true); }
+    if (n === 3) { ensurePlan(); }
+
+    // bring the top of the tool into view and move focus to the new heading
+    var anchor = $('levers');
+    if (anchor) {
+      var y = anchor.getBoundingClientRect().top + window.scrollY - 56;
+      window.scrollTo({ top: y < 0 ? 0 : y, behavior: 'smooth' });
+    }
+    var h = $(SCREENS[n]).querySelector('h3');
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  }
+
+  function ensurePlan() {
+    // (re)generate only when the inputs changed since the last plan
+    if (lastPlan === null || lastPlanSig !== planSignature()) generatePlan();
+  }
+
+  function updateStepper(n) {
+    Array.prototype.forEach.call(document.querySelectorAll('.stepper .step'), function (li) {
+      var step = Number(li.getAttribute('data-step'));
+      li.classList.toggle('is-active', step === n);
+      li.classList.toggle('is-done', step < n);
+      if (step === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+    });
+  }
+
+  function flashHint(id) {
+    var el = $(id); if (!el) return;
+    el.hidden = false;
+    el.classList.remove('nav-hint-flash');
+    void el.offsetWidth;           // restart the animation
+    el.classList.add('nav-hint-flash');
+  }
+
   /* ---------- wiring ---------- */
   function init() {
     document.body.setAttribute('data-mode', 'percent');
@@ -472,10 +534,21 @@
       b.addEventListener('click', function () { setMode(b.getAttribute('data-mode') === 'r' ? 'r' : 'percent'); });
     });
 
-    $('generate-plan').addEventListener('click', generatePlan);
+    // wizard buttons
+    $('to-targets').addEventListener('click', function () { goToScreen(2); });
+    $('back-to-baseline').addEventListener('click', function () { goToScreen(1); });
+    $('to-plan').addEventListener('click', function () { goToScreen(3); });
+    $('back-to-targets').addEventListener('click', function () { goToScreen(2); });
+    $('regen-plan').addEventListener('click', function () { generatePlan(); });
     $('copy-plan').addEventListener('click', copyPlan);
 
+    // stepper is clickable (back to any completed step, forward if allowed)
+    Array.prototype.forEach.call(document.querySelectorAll('.stepper .step'), function (li) {
+      li.addEventListener('click', function () { goToScreen(Number(li.getAttribute('data-step'))); });
+    });
+
     update();
+    updateStepper(1);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
