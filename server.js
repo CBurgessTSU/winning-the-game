@@ -248,6 +248,10 @@ var MIME = {
 function serveStatic(req, res) {
   var urlPath = decodeURIComponent((req.url.split('?')[0]) || '/');
   if (urlPath === '/') urlPath = '/index.html';
+  // The Mindset Assessment now lives inside 10 Conversations.
+  if (urlPath === '/mindset' || urlPath === '/mindset.html') {
+    res.writeHead(301, { 'Location': '/conversations' }); res.end(); return;
+  }
   // resolve safely inside PUBLIC_DIR (block path traversal)
   var filePath = path.normalize(path.join(PUBLIC_DIR, urlPath));
   if (filePath.indexOf(PUBLIC_DIR) !== 0) {

@@ -3,8 +3,12 @@
 A single-page microsite hosting custom tools for a TradeSmart University class:
 
 1. **4 Levers of Profitability Calculator** — built and working.
-2. **Mindset Assessment Worksheet** — placeholder (waiting on spec).
-3. **10 Conversations To Change Your Trading** — placeholder (waiting on spec).
+2. **10 Conversations To Change Your Trading** — built. A prompt library for
+   Josh-Bot (https://joshbot.tradesmartu.com): the Mindset Assessment is the
+   "Start here" card, followed by ten more prompts. Students copy a prompt and
+   paste it into Josh-Bot. The prompts live in `docs/assets/conversations-data.js`
+   (copied from `sources/Prompt_Guide_Section8_WinningTheGame_Final.txt`).
+   `/mindset` redirects to `/conversations`.
 
 The site is plain HTML/CSS/JavaScript — no build step, no frameworks, nothing to
 install. A tiny Node service (`server.js`) serves the pages and powers the
@@ -111,12 +115,3 @@ which changes it with no code edit):
   and inexpensive for a class tool called many times.
 - **`claude-opus-5-5`** — the most capable tier: higher quality, higher cost.
 - **`claude-sonnet-4-6`** — previous generation; no thinking overhead at all.
-
----
-
-## Adding the other two tools later
-
-When Josh's specs arrive, the placeholder sections in `docs/index.html`
-(`#mindset` and `#conversations`) are where the next two tools go. They can be
-built the same way — all client-side, with the AI service reused if any of them
-needs Claude.
