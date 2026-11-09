@@ -24,6 +24,7 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
 
 /* ---------- load .env if present (tiny, no dependency) ----------
    Reads KEY=value lines from a local .env file for convenience. On Render you
@@ -252,16 +253,47 @@ function serveStatic(req, res) {
   if (filePath.indexOf(PUBLIC_DIR) !== 0) {
     res.writeHead(403); res.end('Forbidden'); return;
   }
-  fs.readFile(filePath, function (err, content) {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('Not found');
+  function notFound() {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not found');
+  }
+  // Send a file with an ETag + revalidate-always caching so browsers can never
+  // run a stale asset (the usual cause of "I changed it but the page didn't").
+  // `no-cache` means "you may cache, but revalidate every time" — on a match we
+  // return a cheap 304 and the browser reuses its copy.
+  function deliver(content, ext) {
+    var etag = '"' + crypto.createHash('sha1').update(content).digest('hex') + '"';
+    var headers = {
+      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Cache-Control': 'no-cache',
+      'ETag': etag
+    };
+    if (req.headers['if-none-match'] === etag) {
+      res.writeHead(304, headers);
+      res.end();
       return;
     }
-    var ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    res.writeHead(200, headers);
     res.end(content);
-  });
+  }
+  function send(fp) {
+    fs.readFile(fp, function (err, content) {
+      if (err) {
+        // Pretty URL with no extension (e.g. /levers) → serve /levers.html
+        if (!path.extname(fp)) { send2(fp + '.html'); return; }
+        notFound();
+        return;
+      }
+      deliver(content, path.extname(fp).toLowerCase());
+    });
+  }
+  function send2(fp) {
+    fs.readFile(fp, function (err, content) {
+      if (err) { notFound(); return; }
+      deliver(content, '.html');
+    });
+  }
+  send(filePath);
 }
 
 /* ---------- the server ---------- */

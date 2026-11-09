@@ -4,380 +4,73 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Winning The Game — TradeSmart University</title>
-<meta name="description" content="A set of tools for TradeSmart University students: the 4 Levers of Profitability calculator, the Mindset Assessment Worksheet, and 10 Conversations to Change Your Trading.">
+<meta name="description" content="Three tools for the Winning The Game class with Josh Hesse: the 4 Levers of Profitability calculator, the Mindset Assessment Worksheet, and 10 Conversations to Change Your Trading.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
 
 <!-- ═══════════════════════ HEADER / NAV ═══════════════════════ -->
 <header class="site-header">
   <div class="shell header-inner">
-    <a class="wordmark" href="#top" aria-label="TradeSmart University home">
-      <!-- Drop the real logo in here later: replace this block with
-           <img src="assets/tsu-logo.svg" alt="TradeSmart University"> -->
-      <span class="wordmark-mark" aria-hidden="true">T</span>
-      <span class="wordmark-text"><span class="wm-grad">TradeSmart</span><span class="wm-uni">University</span></span>
+    <a class="wordmark" href="/" aria-label="TradeSmart University home">
+      <img src="/assets/tsu_3-0_logo-with-text.svg" alt="TradeSmart University" class="wordmark-logo">
     </a>
     <nav class="site-nav" aria-label="Tools">
-      <a href="#levers">4 Levers Calculator</a>
-      <a href="#mindset">Mindset Assessment</a>
-      <a href="#conversations">10 Conversations</a>
+      <a href="/levers">4 Levers Calculator</a>
+      <a href="/mindset">Mindset Assessment</a>
+      <a href="/conversations">10 Conversations</a>
     </nav>
     <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
       <span></span><span></span><span></span>
     </button>
   </div>
   <div class="mobile-nav" id="mobile-nav" hidden>
-    <a href="#levers">4 Levers Calculator</a>
-    <a href="#mindset">Mindset Assessment</a>
-    <a href="#conversations">10 Conversations</a>
+    <a href="/levers">4 Levers Calculator</a>
+    <a href="/mindset">Mindset Assessment</a>
+    <a href="/conversations">10 Conversations</a>
   </div>
 </header>
 
 <main id="top">
 
   <!-- ═══════════════════════ HERO ═══════════════════════ -->
-  <section class="hero">
+  <section class="hero hero-landing">
     <div class="shell">
-      <p class="eyebrow">Winning The Game</p>
-      <h1 class="hero-title">Same account.<br>Same number of setups.</h1>
-      <div class="hero-swing" aria-hidden="false">
-        <div class="swing-figure">
-          <span class="swing-label">A year like this</span>
-          <span class="swing-amount is-low">$384</span>
-        </div>
-        <div class="swing-arrow" aria-hidden="true">
-          <svg viewBox="0 0 48 24" width="48" height="24" fill="none"><path d="M2 12h40m0 0-8-8m8 8-8 8" stroke="url(#swingGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="swingGrad" x1="0" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#38BDF8"/><stop offset="0.5" stop-color="#60A5FA"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs></svg>
-        </div>
-        <div class="swing-figure">
-          <span class="swing-label">or a year like this</span>
-          <span class="swing-amount is-high">$1,544</span>
-        </div>
-      </div>
-      <p class="hero-sub">The difference isn't the market. It's four levers you already control — how often you trade, how often you win, how much you make when you win, and how much you give back when you lose. Set your real numbers below and watch what small, believable changes do.</p>
-      <a class="btn btn-primary" href="#levers">Start with the 4 Levers</a>
+      <p class="eyebrow">Winning The Game · with Josh Hesse</p>
+      <h1 class="hero-title">The math and the mindset<br>behind consistent trading.</h1>
+      <p class="hero-sub">Three tools from the class, in one place. Start with the numbers you already control, then work on the decisions behind them. Pick a tool to begin.</p>
     </div>
   </section>
 
-  <!-- ═══════════════════════ TOOL 1 — 4 LEVERS CALCULATOR (3-step wizard) ═══════════════════════ -->
-  <section class="tool" id="levers">
+  <!-- ═══════════════════════ TOOL CARDS ═══════════════════════ -->
+  <section class="landing">
     <div class="shell">
-      <header class="tool-head">
-        <p class="eyebrow">Tool 01</p>
-        <h2 class="tool-title">4 Levers of Profitability</h2>
-        <p class="tool-lede">Three steps: enter where you are today, set small improvement targets and watch the result multiply, then build a plan you'll commit to.</p>
-      </header>
+      <div class="tool-cards">
 
-      <!-- STEPPER -->
-      <ol class="stepper" id="stepper" aria-label="Progress">
-        <li class="step is-active" data-step="1" aria-current="step">
-          <span class="step-num">1</span>
-          <span class="step-text"><span class="step-title">Enter baseline</span><span class="step-sub">Your numbers now</span></span>
-        </li>
-        <li class="step" data-step="2">
-          <span class="step-num">2</span>
-          <span class="step-text"><span class="step-title">Set targets</span><span class="step-sub">Where you could be</span></span>
-        </li>
-        <li class="step" data-step="3">
-          <span class="step-num">3</span>
-          <span class="step-text"><span class="step-title">Build your plan</span><span class="step-sub">Commit to it</span></span>
-        </li>
-      </ol>
+        <a class="tool-card" href="/levers">
+          <span class="tc-num">01</span>
+          <h2 class="tc-title">4 Levers of Profitability</h2>
+          <p class="tc-desc">See what small, believable changes to four numbers — how often you trade, how often you win, and what you make or give back — do to a whole year of trading.</p>
+          <span class="tc-cta">Open the calculator <span aria-hidden="true">→</span></span>
+        </a>
 
-      <!-- Mode toggle (applies to steps 1 & 2) -->
-      <div class="mode-toggle" id="mode-toggle" role="radiogroup" aria-label="Calculation mode">
-        <button class="mode-btn is-active" data-mode="percent" role="radio" aria-checked="true">% Returns</button>
-        <button class="mode-btn" data-mode="r" role="radio" aria-checked="false">R-Values</button>
-      </div>
+        <a class="tool-card" href="/mindset">
+          <span class="tc-num">02</span>
+          <h2 class="tc-title">Mindset Assessment Worksheet</h2>
+          <p class="tc-desc">Examine the needs, beliefs, values, and personal rules shaping your trading decisions — so you can see the patterns for yourself.</p>
+          <span class="tc-cta">Open the worksheet <span aria-hidden="true">→</span></span>
+        </a>
 
-      <!-- ─────────── SCREEN 1 · BASELINE ─────────── -->
-      <div class="screen" id="screen-baseline" role="group" aria-labelledby="screen-baseline-h">
-        <div class="screen-head">
-          <span class="stage-chip stage-measure">Step 1 · Measure</span>
-          <h3 id="screen-baseline-h">Where you are now</h3>
-          <p class="screen-lede">Use your last 10–20 trades, or a typical month. Honest numbers make the rest of this real.</p>
-        </div>
+        <a class="tool-card" href="/conversations">
+          <span class="tc-num">03</span>
+          <h2 class="tc-title">10 Conversations to Change Your Trading</h2>
+          <p class="tc-desc">Ten guided prompts for Josh-Bot that surface the hidden psychological patterns behind how you trade.</p>
+          <span class="tc-cta">Start the conversations <span aria-hidden="true">→</span></span>
+        </a>
 
-        <div class="baseline-grid">
-          <div class="field">
-            <label for="in-trades">Number of Trades</label>
-            <p class="field-hint">How many setups you take in a period (a month, or your last 10–20 trades).</p>
-            <input type="number" id="in-trades" inputmode="numeric" min="0" step="1" placeholder="e.g. 16">
-          </div>
-
-          <div class="field" data-mode-field="value">
-            <label for="in-value">
-              <span class="lbl-percent">Average Trade Value <span class="unit">($)</span></span>
-              <span class="lbl-r">
-                Your R <span class="unit">($)</span>
-                <button type="button" class="info" aria-label="What is R?" data-tip="Your R is the maximum dollar amount you risk on a single trade. In the TSU system, R is 1% of your account value.">i</button>
-              </span>
-            </label>
-            <p class="field-hint lbl-percent">The typical dollar size of one position.</p>
-            <p class="field-hint lbl-r">The most you risk on any one trade.</p>
-            <input type="number" id="in-value" inputmode="decimal" min="0" step="any" placeholder="e.g. 1000">
-          </div>
-
-          <div class="field field-wide">
-            <label for="in-wins">Winning Trades <span class="unit">(#)</span></label>
-            <p class="field-hint">How many of those trades closed as wins. Losses fill in automatically.</p>
-            <input type="number" id="in-wins" inputmode="numeric" min="0" step="1" placeholder="e.g. 11">
-            <div class="derived-row" id="winloss-derived" hidden>
-              <div class="derived"><span class="derived-label">Losing Trades</span><span class="derived-val" id="out-losses">—</span></div>
-              <div class="derived"><span class="derived-label">Win %</span><span class="derived-val" id="out-winpct">—</span></div>
-              <div class="derived"><span class="derived-label">Loss %</span><span class="derived-val" id="out-losspct">—</span></div>
-            </div>
-          </div>
-
-          <div class="field" data-mode-field="win">
-            <label for="in-win-return">
-              <span class="lbl-percent">Average Winner <span class="unit">(% of trade value)</span></span>
-              <span class="lbl-r">Average Winner <span class="unit">(R multiple)</span></span>
-            </label>
-            <p class="field-hint lbl-percent">What a typical winning trade gains, as a % of the position.</p>
-            <p class="field-hint lbl-r">What a typical winner makes, in R. (1.3 means you make 1.3× what you risked.)</p>
-            <input type="number" id="in-win-return" inputmode="decimal" min="0" step="any" placeholder="e.g. 18">
-          </div>
-
-          <div class="field" data-mode-field="loss">
-            <label for="in-loss-return">
-              <span class="lbl-percent">Average Loss <span class="unit">(% of trade value)</span></span>
-              <span class="lbl-r">Average Loss <span class="unit">(R multiple)</span></span>
-            </label>
-            <p class="field-hint lbl-percent">What a typical losing trade gives back, as a % of the position.</p>
-            <p class="field-hint lbl-r">What a typical loss costs, in R. Your target is 1.0R — your loss should equal your R, no more.</p>
-            <input type="number" id="in-loss-return" inputmode="decimal" min="0" step="any" placeholder="e.g. 30">
-            <p class="field-warn" id="loss-warn" hidden>Your average loss is above 1.2R. Tighter stops keep losses at your R.</p>
-          </div>
-
-          <div class="field field-wide" data-mode-field="commissions">
-            <label for="in-commissions">Commissions <span class="unit">($ total, optional)</span></label>
-            <p class="field-hint">Total commissions across all those trades. Leave blank if none.</p>
-            <input type="number" id="in-commissions" inputmode="decimal" min="0" step="any" placeholder="e.g. 96">
-          </div>
-        </div>
-
-        <!-- Current result bar -->
-        <div class="result-bar" id="s1-result">
-          <span class="result-tag">Your result now</span>
-          <div class="result-figs">
-            <div class="result-stat"><span class="result-label">Profit</span><span class="result-val" id="s1-profit">—</span></div>
-            <div class="result-stat"><span class="result-label" id="s1-sec-label">ROI</span><span class="result-val" id="s1-sec">—</span></div>
-          </div>
-        </div>
-
-        <!-- Nav -->
-        <div class="screen-nav">
-          <p class="nav-hint" id="baseline-hint">Fill in your numbers above to continue.</p>
-          <button class="btn btn-primary" id="to-targets" type="button">Set my improvement targets <span aria-hidden="true">→</span></button>
-        </div>
-      </div>
-
-      <!-- ─────────── SCREEN 2 · TARGETS / WOW ─────────── -->
-      <div class="screen" id="screen-targets" role="group" aria-labelledby="screen-targets-h" hidden>
-        <div class="screen-head">
-          <span class="stage-chip stage-goal">Step 2 · Goal</span>
-          <h3 id="screen-targets-h">Where you could be</h3>
-          <p class="screen-lede">Nudge one lever at a time. Keep every change small and believable — this is about what you can actually do over your next 10–20 trades.</p>
-        </div>
-
-        <!-- Comparison: lever · now · your change · projected -->
-        <div class="cmp" role="table" aria-label="Lever comparison">
-          <div class="cmp-head" role="row">
-            <span class="cmp-h-lever" role="columnheader">Lever</span>
-            <span class="cmp-h-now" role="columnheader">Now</span>
-            <span class="cmp-h-change" role="columnheader">Your change</span>
-            <span class="cmp-h-proj" role="columnheader">Projected</span>
-          </div>
-
-          <div class="cmp-row" role="row">
-            <div class="cmp-lever"><span class="cmp-name">Number of Trades</span><span class="cmp-hint">Fewer, higher-quality setups is often the improvement.</span></div>
-            <div class="cmp-now"><span class="cmp-cell-label">Now</span><span class="cmp-val" id="cmp-trades-now">—</span></div>
-            <div class="cmp-change"><span class="cmp-cell-label">Your change</span>
-              <div class="target-input"><span class="target-sign">±</span><input type="number" id="tg-trades" inputmode="numeric" step="1" placeholder="-1"></div>
-            </div>
-            <div class="cmp-proj"><span class="cmp-cell-label">Projected</span><span class="cmp-val cmp-val-up" id="cmp-trades-proj">—</span></div>
-          </div>
-
-          <div class="cmp-row" role="row">
-            <div class="cmp-lever"><span class="cmp-name">Win-Loss Ratio</span><span class="cmp-hint">Even +4 points to your win rate makes a large difference.</span></div>
-            <div class="cmp-now"><span class="cmp-cell-label">Now</span><span class="cmp-val" id="cmp-winpct-now">—</span></div>
-            <div class="cmp-change"><span class="cmp-cell-label">+ points to win %</span>
-              <div class="target-input"><span class="target-sign">+</span><input type="number" id="tg-winpct" inputmode="decimal" step="any" placeholder="4"></div>
-            </div>
-            <div class="cmp-proj"><span class="cmp-cell-label">Projected</span><span class="cmp-val cmp-val-up" id="cmp-winpct-proj">—</span></div>
-          </div>
-
-          <div class="cmp-row" role="row" data-mode-field="win">
-            <div class="cmp-lever"><span class="cmp-name">Average Winner</span><span class="cmp-hint">Holding winners a little longer lifts this.</span></div>
-            <div class="cmp-now"><span class="cmp-cell-label">Now</span><span class="cmp-val" id="cmp-win-now">—</span></div>
-            <div class="cmp-change">
-              <span class="cmp-cell-label lbl-percent">+ % points</span><span class="cmp-cell-label lbl-r">+ R</span>
-              <div class="target-input"><span class="target-sign">+</span><input type="number" id="tg-win" inputmode="decimal" step="any" placeholder="6"></div>
-            </div>
-            <div class="cmp-proj"><span class="cmp-cell-label">Projected</span><span class="cmp-val cmp-val-up" id="cmp-win-proj">—</span></div>
-          </div>
-
-          <div class="cmp-row" role="row" data-mode-field="loss">
-            <div class="cmp-lever"><span class="cmp-name">Average Loss</span><span class="cmp-hint">Cutting losers sooner shrinks this. Use a minus to reduce it.</span></div>
-            <div class="cmp-now"><span class="cmp-cell-label">Now</span><span class="cmp-val" id="cmp-loss-now">—</span></div>
-            <div class="cmp-change">
-              <span class="cmp-cell-label lbl-percent">− % points</span><span class="cmp-cell-label lbl-r">− R</span>
-              <div class="target-input"><span class="target-sign">±</span><input type="number" id="tg-loss" inputmode="decimal" step="any" placeholder="-5"></div>
-            </div>
-            <div class="cmp-proj"><span class="cmp-cell-label">Projected</span><span class="cmp-val cmp-val-up" id="cmp-loss-proj">—</span></div>
-          </div>
-        </div>
-
-        <!-- THE WOW MOMENT -->
-        <div class="wow" id="wow">
-          <div class="wow-inner">
-            <p class="wow-label">Your profit improvement</p>
-            <div class="wow-number" id="wow-number">0%</div>
-            <div class="beforeafter">
-              <div class="ba-stat"><span class="ba-label">Profit now</span><span class="ba-val" id="s2-current-profit">—</span></div>
-              <span class="ba-arrow" aria-hidden="true">→</span>
-              <div class="ba-stat ba-up"><span class="ba-label">Projected profit</span><span class="ba-val" id="s2-projected-profit">—</span></div>
-            </div>
-            <p class="wow-caption">Small improvements in each lever create a multiplied result.</p>
-          </div>
-        </div>
-
-        <!-- TIME IN TRADE -->
-        <div class="time-in-trade" id="time-in-trade">
-          <div class="section-divider"><span>Time in Trade</span></div>
-          <p class="tit-intro">This one doesn't change the profit above — it shows how moving faster lets you run your edge more times a year. Optional.</p>
-          <div class="tit-inputs">
-            <div class="field">
-              <label for="tit-current">Current average days in a trade</label>
-              <input type="number" id="tit-current" inputmode="decimal" min="0" step="any" placeholder="e.g. 8">
-            </div>
-            <div class="field">
-              <label for="tit-target">Target average days in a trade</label>
-              <input type="number" id="tit-target" inputmode="decimal" min="0" step="any" placeholder="e.g. 4">
-            </div>
-          </div>
-          <div class="tit-results" id="tit-results" hidden>
-            <div class="tit-stat-row">
-              <div class="tit-stat">
-                <span class="tit-stat-label">Cycles per year now</span>
-                <span class="tit-stat-val" id="tit-current-cycles">—</span>
-              </div>
-              <div class="tit-stat tit-stat-up">
-                <span class="tit-stat-label">Cycles per year improved</span>
-                <span class="tit-stat-val" id="tit-projected-cycles">—</span>
-              </div>
-            </div>
-            <div class="tit-stat-row">
-              <div class="tit-stat">
-                <span class="tit-stat-label">Annual potential now</span>
-                <span class="tit-stat-val" id="tit-current-annual">—</span>
-              </div>
-              <div class="tit-stat tit-stat-up">
-                <span class="tit-stat-label">Annual potential improved</span>
-                <span class="tit-stat-val" id="tit-projected-annual">—</span>
-              </div>
-            </div>
-            <p class="tit-narrative" id="tit-narrative"></p>
-            <div class="callout">
-              <p><strong>The 3-Day Rule:</strong> if a trade hasn't moved in your favor within 3 trading days, exit. Capital tied up in a stalled trade is capital that can't be deployed elsewhere. Faster recycling isn't just efficiency — it's compounding your edge.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Nav -->
-        <div class="screen-nav">
-          <button class="btn btn-ghost" id="back-to-baseline" type="button"><span aria-hidden="true">←</span> Back</button>
-          <p class="nav-hint" id="targets-hint">Set at least one target to build your plan.</p>
-          <button class="btn btn-primary" id="to-plan" type="button">Build my plan <span aria-hidden="true">→</span></button>
-        </div>
-      </div>
-
-      <!-- ─────────── SCREEN 3 · YOUR PLAN ─────────── -->
-      <div class="screen" id="screen-plan" role="group" aria-labelledby="screen-plan-h" hidden>
-        <div class="screen-head">
-          <span class="stage-chip stage-plan">Step 3 · Plan</span>
-          <h3 id="screen-plan-h">Your plan</h3>
-          <p class="screen-lede">Here's the gap you're closing, and the specific, process-based moves to close it. Write what you'll actually do under each lever.</p>
-        </div>
-
-        <!-- Summary bar: now → improvement → projected -->
-        <div class="result-bar result-bar-plan">
-          <div class="result-figs">
-            <div class="result-stat"><span class="result-label">Profit now</span><span class="result-val" id="s3-current-profit">—</span></div>
-            <div class="result-stat result-imp"><span class="result-label">Improvement</span><span class="result-val" id="s3-improvement">—</span></div>
-            <div class="result-stat result-up"><span class="result-label">Projected profit</span><span class="result-val" id="s3-projected-profit">—</span></div>
-          </div>
-        </div>
-
-        <!-- CIRCLE OF PROGRESS -->
-        <div class="circle-of-progress" id="circle-of-progress">
-          <div class="cop-wrap">
-            <div class="cop-graphic" id="cop-graphic" aria-hidden="true"></div>
-            <div class="cop-copy">
-              <p class="cop-line">You've <strong>measured</strong> your baseline and set your <strong>goal</strong>. Now let's build your <strong>plan</strong>.</p>
-              <p class="cop-sub">This isn't a one-time exercise. Trade the plan, measure again, and correct — the loop is the work.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI RECOMMENDATIONS + COMMITMENTS -->
-        <div class="plan-section" id="plan-section">
-          <div class="section-divider"><span>Your commitments</span></div>
-
-          <div class="plan-status" id="plan-status" hidden></div>
-          <div class="lever-cards" id="lever-cards"></div>
-
-          <div class="plan-footer" id="plan-footer" hidden>
-            <div class="comeback">
-              <p><strong>Come back.</strong> Run this tool again after your next 10–20 trades to measure your improvement and start the next cycle.</p>
-            </div>
-            <div class="plan-actions">
-              <button class="btn btn-primary" id="copy-plan" type="button">Copy my commitment card</button>
-              <button class="btn btn-ghost" id="regen-plan" type="button">Regenerate recommendations</button>
-              <span class="copy-feedback" id="copy-feedback" hidden>Copied to your clipboard.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Nav -->
-        <div class="screen-nav">
-          <button class="btn btn-ghost" id="back-to-targets" type="button"><span aria-hidden="true">←</span> Adjust my targets</button>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ═══════════════════════ TOOL 2 — MINDSET ASSESSMENT (placeholder) ═══════════════════════ -->
-  <section class="tool tool-placeholder" id="mindset">
-    <div class="shell">
-      <header class="tool-head">
-        <p class="eyebrow">Tool 02</p>
-        <h2 class="tool-title">Mindset Assessment Worksheet</h2>
-        <p class="tool-lede">An interactive worksheet to examine the needs, beliefs, values, and personal rules shaping your trading decisions — so you can see the patterns for yourself.</p>
-      </header>
-      <div class="placeholder-card">
-        <span class="placeholder-badge">In development</span>
-        <p>This tool is being built from Josh's specification. It will live right here on this page.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════ TOOL 3 — 10 CONVERSATIONS (placeholder) ═══════════════════════ -->
-  <section class="tool tool-placeholder" id="conversations">
-    <div class="shell">
-      <header class="tool-head">
-        <p class="eyebrow">Tool 03</p>
-        <h2 class="tool-title">10 Conversations to Change Your Trading</h2>
-        <p class="tool-lede">Ten custom prompts for Josh-Bot that help surface the hidden psychological patterns behind your trading decisions.</p>
-      </header>
-      <div class="placeholder-card">
-        <span class="placeholder-badge">In development</span>
-        <p>This guide is being built from Josh's specification. It will live right here on this page.</p>
       </div>
     </div>
   </section>
@@ -386,16 +79,11 @@
 
 <footer class="site-footer">
   <div class="shell footer-inner">
-    <span class="footer-mark"><span class="wm-grad">TradeSmart</span> University</span>
+    <span class="footer-mark"><img src="/assets/tsu_3-0_logo-with-text.svg" alt="TradeSmart University" class="footer-logo"></span>
     <span class="footer-note">Winning The Game · For TSU students</span>
   </div>
 </footer>
 
-<!-- Tooltip bubble (shared) -->
-<div class="tip-bubble" id="tip-bubble" role="tooltip" hidden></div>
-
-<script src="assets/config.js"></script>
-<script src="assets/levers.js"></script>
-<script src="assets/app.js"></script>
+<script src="/assets/app.js"></script>
 </body>
 </html>

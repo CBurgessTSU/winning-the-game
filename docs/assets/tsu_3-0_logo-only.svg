@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="325.79227"
+   height="327.68842"
+   viewBox="0 0 325.79226 327.68842"
+   sodipodi:docname="tsu_3-0_logo-only.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient2"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#38bdf8;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#a78bfa;stop-opacity:1;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2"
+       id="linearGradient3"
+       x1="70.395805"
+       y1="70.395805"
+       x2="298.0842"
+       y2="298.0842"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0117772,0,0,1.0176658,325.6099,-3.5707775)" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showguides="true"
+     inkscape:zoom="1.5821666"
+     inkscape:cx="276.51955"
+     inkscape:cy="145.6863"
+     inkscape:window-width="1728"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="33"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1">
+    <sodipodi:guide
+       position="156.89273,371.69434"
+       orientation="0,-1"
+       id="guide26"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="461.70659,124.10111"
+       orientation="0,-1"
+       id="guide27"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="2138.2268,137.39708"
+       orientation="1,0"
+       id="guide28"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="215.51488,44.137192"
+       orientation="0,-1"
+       id="guide29"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="428.52255,123.76592"
+       orientation="1,0"
+       id="guide30"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="2119.1208,358.73573"
+       orientation="0,-1"
+       id="guide32"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g1"
+     transform="translate(-21.975906,-20.079777)">
+    <g
+       id="g21"
+       inkscape:label="Logo"
+       transform="translate(-327.14769)">
+      <rect
+         style="fill:url(#linearGradient3);stroke-width:1.01472"
+         id="rect1"
+         width="325.79227"
+         height="327.68842"
+         x="349.1236"
+         y="20.079777"
+         rx="20.235544"
+         inkscape:label="T bg" />
+      <g
+         id="g20"
+         inkscape:label="T"
+         transform="matrix(1.0052227,0,0,0.98872183,321.35239,4.4034217)">
+        <rect
+           style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.991057"
+           id="rect4"
+           width="32.866333"
+           height="220.38054"
+           x="173.18024"
+           y="85.326027" />
+        <path
+           id="path13"
+           style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.731313"
+           d="m 295.65009,57.515625 c 8.31,0 15,6.69 15,15 v 0.01172 0.326172 51.343753 H 277.7829 V 90.382812 H 173.17939 V 57.515625 h 118.02343 3.33008 z"
+           transform="matrix(-1,0,0,1,379.26337,0)" />
+        <path
+           id="path6"
+           style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.731313"
+           d="m 173.17969,57.515625 v 32.867187 h 60.78515 V 57.515625 Z m 76.42773,0 v 32.867187 h 28.17578 v 33.814458 h 32.86719 v -51.343754 -0.326172 -0.01172 c 0,-8.31 -6.69,-15 -15,-15 h -1.11719 -3.33008 z" />
+      </g>
+    </g>
+  </g>
+</svg>

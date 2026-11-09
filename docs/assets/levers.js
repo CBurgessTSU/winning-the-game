@@ -8,8 +8,8 @@
   'use strict';
 
   var $ = function (id) { return document.getElementById(id); };
+  function setTxt(id, v) { var el = $(id); if (el) el.textContent = v; }
   var cfg = window.TSU_CONFIG || { aiBaseUrl: '' };
-  var TRADING_DAYS = 252;
 
   // Where the AI service lives. If aiBaseUrl is set, use it (points the page at
   // a service on another host). If it's blank, the service is the same server
@@ -24,18 +24,18 @@
 
   /* ---------- state (kept separately per mode) ---------- */
   function blankInputs() { return { trades: '', value: '', wins: '', winReturn: '', lossReturn: '', commissions: '' }; }
-  function blankTargets() { return { trades: '', winpct: '', win: '', loss: '' }; }
+  function blankTargets() { return { trades: '', wins: '', win: '', loss: '' }; }
   var data = {
     percent: { inputs: blankInputs(), targets: blankTargets() },
     r: { inputs: blankInputs(), targets: blankTargets() }
   };
-  var mode = 'percent';
+  var mode = 'r';
   var commitments = {};   // keyed by lever name, so recalcs don't lose typed text
   var lastPlan = null;    // last AI response (or fallback marker)
   var lastPlanSig = null; // signature of inputs the current plan was built from
 
   var inEls = { trades: 'in-trades', value: 'in-value', wins: 'in-wins', winReturn: 'in-win-return', lossReturn: 'in-loss-return', commissions: 'in-commissions' };
-  var tgEls = { trades: 'tg-trades', winpct: 'tg-winpct', win: 'tg-win', loss: 'tg-loss' };
+  var tgEls = { trades: 'tg-trades', wins: 'tg-wins', win: 'tg-win', loss: 'tg-loss' };
 
   /* ---------- helpers ---------- */
   function num(v) { if (v === '' || v === null || v === undefined) return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
@@ -75,16 +75,16 @@
       totalR = profit / value;
     }
     return { trades: trades, value: value, wins: wins, losses: losses, winReturn: wr, lossReturn: lr,
-      commissions: comm, winPct: winPct, lossPct: lossPct, profit: profit, roi: roi, totalR: totalR };
+      commissions: comm, winPct: winPct, lossPct: lossPct, winTotal: winTotal, lossTotal: lossTotal,
+      profit: profit, roi: roi, totalR: totalR };
   }
 
   // Applies targets (deltas) to a baseline. Returns projected object or null.
   function computeProjected(m, base, t) {
     if (!base) return null;
-    var dTrades = num(t.trades) || 0, dWinPct = num(t.winpct) || 0, dWin = num(t.win) || 0, dLoss = num(t.loss) || 0;
+    var dTrades = num(t.trades) || 0, dWins = num(t.wins) || 0, dWin = num(t.win) || 0, dLoss = num(t.loss) || 0;
     var newTrades = clamp(Math.round(base.trades + dTrades), 1, 100000);
-    var newWinPct = clamp(base.winPct + dWinPct, 0, 100);
-    var newWins = clamp(Math.round(newWinPct / 100 * newTrades), 0, newTrades);
+    var newWins = clamp(Math.round(base.wins + dWins), 0, newTrades);
     var newLosses = newTrades - newWins;
     var newWr = Math.max(0, base.winReturn + dWin);
     var newLr = Math.max(0, base.lossReturn + dLoss);
@@ -101,12 +101,14 @@
       profit = winTotal - lossTotal;
       totalR = profit / base.value;
     }
-    return { trades: newTrades, wins: newWins, losses: newLosses, winReturn: newWr, lossReturn: newLr,
+    return { trades: newTrades, value: base.value, commissions: base.commissions,
+      wins: newWins, losses: newLosses, winReturn: newWr, lossReturn: newLr,
+      winTotal: winTotal, lossTotal: lossTotal,
       winPct: newWins / newTrades * 100, profit: profit, roi: roi, totalR: totalR };
   }
 
   function hasAnyTarget(t) {
-    return [t.trades, t.winpct, t.win, t.loss].some(function (v) { var n = num(v); return n !== null && n !== 0; });
+    return [t.trades, t.wins, t.win, t.loss].some(function (v) { var n = num(v); return n !== null && n !== 0; });
   }
   function fmtUnit(v, unit) { if (v === null || v === undefined) return '—'; var n = Math.round(v * 10) / 10; return (unit === 'R') ? n.toFixed(1) + 'R' : n + '%'; }
 
@@ -133,6 +135,7 @@
     return { val: val, usePct: usePct };
   }
   function fmtImprovement(imp) { if (!imp) return '—'; return imp.usePct ? (imp.val + '%') : ('+' + money(imp.val)); }
+  function signNum(n) { n = Math.round(n * 10) / 10; return (n > 0 ? '+' : '') + n; }
 
   /* ---------- the main recompute + render ---------- */
   function update() {
@@ -148,37 +151,50 @@
     var lrVal = num(d.inputs.lossReturn);
     $('loss-warn').hidden = !(mode === 'r' && lrVal !== null && lrVal > 1.2);
 
-    /* — Step 1: derived win/loss row — */
-    var derivedRow = $('winloss-derived');
-    if (base) {
-      derivedRow.hidden = false;
-      $('out-losses').textContent = base.losses;
-      $('out-winpct').textContent = pct(base.winPct);
-      $('out-losspct').textContent = pct(base.lossPct);
-    } else {
-      derivedRow.hidden = true;
+    /* — Step 1: inline result cells in the metrics table — */
+    setTxt('out-losses', base ? String(base.losses) : '—');
+    setTxt('out-winpct', base ? pct(base.winPct, 0) : '—');
+    setTxt('out-losspct', base ? pct(base.lossPct, 0) : '—');
+    setTxt('r-win', base ? money(base.winTotal) : '—');
+    setTxt('r-loss', base ? money(base.lossTotal) : '—');
+    setTxt('r-comm', (base && base.commissions > 0) ? money(base.commissions / base.trades) + '/t' : '—');
+
+    /* — Unlock the Improve + Projected columns once the Current column is valid — */
+    var tri = $('triptych');
+    if (tri) {
+      tri.classList.toggle('is-locked', !base);
+      var lock = $('tri-lock'); if (lock) lock.setAttribute('aria-hidden', base ? 'true' : 'false');
     }
 
-    /* — Step 1: current result bar — */
-    $('s1-sec-label').textContent = secLabel;
-    $('s1-profit').textContent = base ? money(base.profit) : '—';
-    $('s1-sec').textContent = secOf(base);
+    /* — Projected column (Current column shows the live inputs themselves) — */
+    setTxt('proj-trades', proj ? String(proj.trades) : '—');
+    setTxt('proj-value', proj ? money(proj.value) : '—');
+    setTxt('proj-wins', proj ? String(proj.wins) : '—');
+    setTxt('proj-winpct', proj ? pct(proj.winPct, 0) : '—');
+    setTxt('proj-losses', proj ? String(proj.losses) : '—');
+    setTxt('proj-losspct', proj ? pct(100 - proj.winPct, 0) : '—');
+    setTxt('proj-winret', proj ? money(proj.winTotal) : '—');
+    setTxt('proj-winret-sec', proj ? fmtUnit(proj.winReturn, unit) : '—');
+    setTxt('proj-lossret', proj ? money(proj.lossTotal) : '—');
+    setTxt('proj-lossret-sec', proj ? fmtUnit(proj.lossReturn, unit) : '—');
+    setTxt('proj-comm', proj ? money(proj.commissions) : '—');
+    setTxt('proj-comm-sec', (proj && proj.commissions > 0) ? money(proj.commissions / proj.trades) + '/t' : '—');
+    // CENTER · losses are derived (trades − wins), so show how the count moves
+    var lossDelta = (base && proj) ? (proj.losses - base.losses) : null;
+    setTxt('imp-lossrate', (lossDelta !== null && lossDelta !== 0)
+      ? (signNum(lossDelta) + (Math.abs(lossDelta) === 1 ? ' loss' : ' losses')) : '—');
 
-    /* — Step 1: enable / disable the "continue" button — */
-    var toTargets = $('to-targets'), bHint = $('baseline-hint');
-    if (toTargets) toTargets.disabled = !base;
-    if (bHint) bHint.hidden = !!base;
-
-    /* — Step 2: per-lever comparison (now → projected) — */
-    setCmp('trades', base ? String(base.trades) : '—', proj ? String(proj.trades) : '—');
-    setCmp('winpct', base ? pct(base.winPct, 0) : '—', proj ? pct(proj.winPct, 0) : '—');
-    setCmp('win', base ? fmtUnit(base.winReturn, unit) : '—', proj ? fmtUnit(proj.winReturn, unit) : '—');
-    setCmp('loss', base ? fmtUnit(base.lossReturn, unit) : '—', proj ? fmtUnit(proj.lossReturn, unit) : '—');
-
-    /* — Step 2: before / after profit + wow number (no celebratory animation on keystroke) — */
+    /* — before / after profit + ROI + wow number — */
     $('s2-current-profit').textContent = base ? money(base.profit) : '—';
     $('s2-projected-profit').textContent = proj ? money(proj.profit) : '—';
-    renderWow(base, proj, false);
+    setTxt('s2-current-roi', secOf(base));
+    setTxt('s2-projected-roi', secOf(proj));
+    // Count-up celebration the first time a real improvement shows; live (instant) after that.
+    var hasImp = !!improvement(base, proj);
+    if (!hasImp) wowCelebrated = false;
+    var celebrate = hasImp && !wowCelebrated;
+    if (celebrate) wowCelebrated = true;
+    renderWow(base, proj, celebrate);
 
     /* — Step 2: time in trade — */
     updateTimeInTrade(base, proj);
@@ -195,14 +211,9 @@
     if (tHint) tHint.hidden = !!ready;
   }
 
-  function setCmp(key, nowTxt, projTxt) {
-    var a = $('cmp-' + key + '-now'), b = $('cmp-' + key + '-proj');
-    if (a) a.textContent = nowTxt;
-    if (b) b.textContent = projTxt;
-  }
-
   /* ---------- wow number ---------- */
   var wowShownValue = null;
+  var wowCelebrated = false;
   function renderWow(base, proj, animate) {
     var el = $('wow-number'); if (!el) return;
     var imp = improvement(base, proj);
@@ -231,24 +242,31 @@
 
   /* ---------- Time in Trade ---------- */
   function updateTimeInTrade(base, proj) {
-    var results = $('tit-results');
-    if (!base || !proj) { results.hidden = true; return; }
+    // Time in Trade is an optional row that does NOT change the profit math —
+    // it just shows how moving faster lets you recycle capital more often.
+    var thr = $('tit-throughput'), payoff = $('tit-narrative');
     var cur = num($('tit-current').value), tgt = num($('tit-target').value);
-    if (cur === null || cur <= 0 || tgt === null || tgt <= 0) { results.hidden = true; return; }
-    results.hidden = false;
-    var curCycles = TRADING_DAYS / cur, projCycles = TRADING_DAYS / tgt;
-    var curAnnual = base.profit * curCycles, projAnnual = proj.profit * projCycles;
-    var c1 = Math.round(curCycles * 10) / 10, c2 = Math.round(projCycles * 10) / 10;
-    $('tit-current-cycles').textContent = c1;
-    $('tit-projected-cycles').textContent = c2;
-    $('tit-current-annual').textContent = money(curAnnual);
-    $('tit-projected-annual').textContent = money(projAnnual);
-    var diff = Math.round((projCycles - curCycles) * 10) / 10;
-    $('tit-narrative').textContent =
-      'At your current pace of ' + cur + ' days per trade, you complete about ' + c1 +
-      ' cycles per year. Dropping to ' + tgt + ' days gives you about ' + c2 + ' — roughly ' +
-      diff + ' more opportunities to put your edge to work. That turns your projected profit into an annual potential of ' +
-      money(projAnnual) + '.';
+    if (cur === null || cur <= 0 || tgt === null || tgt <= 0) {
+      if (thr) thr.textContent = '—';
+      if (payoff) payoff.hidden = true;
+      return;
+    }
+    var ratio = cur / tgt;
+    var rTxt = (Math.round(ratio * 10) / 10).toFixed(1) + '×';
+    if (thr) thr.textContent = rTxt;
+    if (payoff) {
+      payoff.hidden = false;
+      if (ratio > 1.001) {
+        payoff.textContent = 'At ' + tgt + ' days instead of ' + cur +
+          ', you recycle your capital about ' + rTxt +
+          ' as often — same edge, run more times a year.';
+      } else if (ratio < 0.999) {
+        payoff.textContent = 'At ' + tgt + ' days you hold trades longer than your current ' +
+          cur + ' — you run your edge fewer times a year. Faster exits recycle capital sooner.';
+      } else {
+        payoff.textContent = 'Same holding time as today — shortening it recycles your capital sooner.';
+      }
+    }
   }
 
   /* ---------- which levers were targeted ---------- */
@@ -262,7 +280,7 @@
     function add(cond, name, cur, tgt) { if (cond) out.push({ lever: name, currentValue: cur, targetValue: tgt }); }
     // add() already guards on a non-zero/non-null delta, so out holds only targeted levers
     add(num(d.targets.trades), 'Number of Trades', String(base.trades), String(proj.trades));
-    add(num(d.targets.winpct), 'Win-Loss Ratio', pct(base.winPct, 0), pct(proj.winPct, 0));
+    add(num(d.targets.wins), 'Number of Wins', String(base.wins), String(proj.wins));
     add(num(d.targets.win), 'Average Winner', fmtUnit(base.winReturn, unit), fmtUnit(proj.winReturn, unit));
     add(num(d.targets.loss), 'Average Loss', fmtUnit(base.lossReturn, unit), fmtUnit(proj.lossReturn, unit));
     return out;
@@ -471,23 +489,24 @@
 
   /* ═══════════════════ wizard navigation ═══════════════════ */
   var currentScreen = 1;
-  var SCREENS = { 1: 'screen-baseline', 2: 'screen-targets', 3: 'screen-plan' };
+  var SCREENS = { 1: 'screen-calc', 2: 'screen-plan' };
 
   function baselineReady() { return !!computeBaseline(mode, data[mode].inputs); }
 
   function goToScreen(n) {
     readFields();
-    // guards (also flash the relevant hint)
-    if (n >= 2 && !baselineReady()) { flashHint('baseline-hint'); return; }
-    if (n >= 3 && !hasAnyTarget(data[mode].targets)) { flashHint('targets-hint'); return; }
+    // guard: the plan needs a valid baseline AND at least one target (flash the relevant hint)
+    if (n >= 2) {
+      if (!baselineReady()) { flashHint('targets-hint'); return; }
+      if (!hasAnyTarget(data[mode].targets)) { flashHint('targets-hint'); return; }
+    }
 
     currentScreen = n;
     Object.keys(SCREENS).forEach(function (k) { $(SCREENS[k]).hidden = (Number(k) !== n); });
     updateStepper(n);
-    var mt = $('mode-toggle'); if (mt) mt.hidden = (n === 3);
+    var mt = $('mode-toggle'); if (mt) mt.hidden = (n === 2);
 
-    if (n === 2) { update(); renderWow(computeBaseline(mode, data[mode].inputs), computeProjected(mode, computeBaseline(mode, data[mode].inputs), data[mode].targets), true); }
-    if (n === 3) { ensurePlan(); }
+    if (n === 2) { ensurePlan(); }
 
     // bring the top of the tool into view and move focus to the new heading
     var anchor = $('levers');
@@ -521,24 +540,50 @@
     el.classList.add('nav-hint-flash');
   }
 
+  /* ---------- resilient field watching ----------
+     Some privacy / form-filler / script-blocker browser extensions intercept
+     'input' events on a page before the page's own handlers run, which would
+     stop the calculator recomputing as you type. To be immune to that we
+     (a) listen in the CAPTURE phase on several event types, so our handler
+     runs before an extension in the normal phase can stop the event, and
+     (b) poll the field values on a short timer and recompute only when
+     something actually changed — a backstop that relies on no events at all,
+     so nothing can block it. */
+  var WATCHED_IDS = Object.keys(inEls).map(function (k) { return inEls[k]; })
+    .concat(Object.keys(tgEls).map(function (k) { return tgEls[k]; }))
+    .concat(['tit-current', 'tit-target']);
+
+  function fieldSignature() {
+    return WATCHED_IDS.map(function (id) { var el = $(id); return el ? el.value : ''; }).join('|');
+  }
+
+  function watchFields() {
+    WATCHED_IDS.forEach(function (id) {
+      var el = $(id); if (!el) return;
+      ['input', 'change', 'keyup', 'paste'].forEach(function (ev) {
+        el.addEventListener(ev, update, true);   // capture phase
+      });
+    });
+    var lastSig = fieldSignature();
+    setInterval(function () {
+      var sig = fieldSignature();
+      if (sig !== lastSig) { lastSig = sig; update(); }   // only recompute on real change
+    }, 250);
+  }
+
   /* ---------- wiring ---------- */
   function init() {
-    document.body.setAttribute('data-mode', 'percent');
+    document.body.setAttribute('data-mode', mode);
 
-    Object.keys(inEls).forEach(function (k) { var el = $(inEls[k]); if (el) el.addEventListener('input', update); });
-    Object.keys(tgEls).forEach(function (k) { var el = $(tgEls[k]); if (el) el.addEventListener('input', update); });
-    $('tit-current').addEventListener('input', update);
-    $('tit-target').addEventListener('input', update);
+    watchFields();
 
     Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
       b.addEventListener('click', function () { setMode(b.getAttribute('data-mode') === 'r' ? 'r' : 'percent'); });
     });
 
-    // wizard buttons
-    $('to-targets').addEventListener('click', function () { goToScreen(2); });
-    $('back-to-baseline').addEventListener('click', function () { goToScreen(1); });
-    $('to-plan').addEventListener('click', function () { goToScreen(3); });
-    $('back-to-targets').addEventListener('click', function () { goToScreen(2); });
+    // wizard buttons (2 screens: 1 = calculator, 2 = plan)
+    $('to-plan').addEventListener('click', function () { goToScreen(2); });
+    var backToCalc = $('back-to-targets'); if (backToCalc) backToCalc.addEventListener('click', function () { goToScreen(1); });
     $('regen-plan').addEventListener('click', function () { generatePlan(); });
     $('copy-plan').addEventListener('click', copyPlan);
 

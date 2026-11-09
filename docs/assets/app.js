@@ -20,19 +20,19 @@
     });
   }
 
-  /* ---------- active nav link on scroll ---------- */
-  function initScrollSpy() {
-    var links = Array.prototype.slice.call(document.querySelectorAll('.site-nav a'));
-    var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
-    if (!('IntersectionObserver' in window) || !sections.length) return;
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          links.forEach(function (l) { l.classList.toggle('is-current', l.getAttribute('href') === '#' + e.target.id); });
-        }
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    sections.forEach(function (s) { obs.observe(s); });
+  /* ---------- highlight the nav link for the current page ---------- */
+  function normalizePath(p) {
+    p = (p || '/').split('?')[0].split('#')[0];
+    p = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    if (p.length > 1) p = p.replace(/\/+$/, '');
+    return p || '/';
+  }
+  function initCurrentNav() {
+    var here = normalizePath(location.pathname);
+    var links = document.querySelectorAll('.site-nav a, .mobile-nav a');
+    Array.prototype.forEach.call(links, function (a) {
+      if (normalizePath(a.getAttribute('href')) === here) a.classList.add('is-current');
+    });
   }
 
   /* ---------- tooltips (.info buttons) ---------- */
@@ -91,7 +91,7 @@
     });
   }
 
-  function init() { initNav(); initScrollSpy(); initTooltips(); initCircle(); }
+  function init() { initNav(); initCurrentNav(); initTooltips(); initCircle(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
