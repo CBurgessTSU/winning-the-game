@@ -165,6 +165,8 @@
       tri.classList.toggle('is-locked', !base);
       var lock = $('tri-lock'); if (lock) lock.setAttribute('aria-hidden', base ? 'true' : 'false');
     }
+    // baseline validity also advances the stepper from step 1 to step 2 in place
+    updateStepper();
 
     /* — Projected column (Current column shows the live inputs themselves) — */
     setTxt('proj-trades', proj ? String(proj.trades) : '—');
@@ -503,7 +505,7 @@
 
     currentScreen = n;
     Object.keys(SCREENS).forEach(function (k) { $(SCREENS[k]).hidden = (Number(k) !== n); });
-    updateStepper(n);
+    updateStepper();
     var mt = $('mode-toggle'); if (mt) mt.hidden = (n === 2);
 
     if (n === 2) { ensurePlan(); }
@@ -523,7 +525,16 @@
     if (lastPlan === null || lastPlanSig !== planSignature()) generatePlan();
   }
 
-  function updateStepper(n) {
+  /* The mockup shows 3 steps but baseline + targets share one screen, so the
+     "logical step" is derived: on the calc screen it's 1 (Baseline) until the
+     Current column is valid, then 2 (Set Targets); the plan screen is 3. */
+  function logicalStep() {
+    if (currentScreen === 2) return 3;
+    return baselineReady() ? 2 : 1;
+  }
+
+  function updateStepper() {
+    var n = logicalStep();
     Array.prototype.forEach.call(document.querySelectorAll('.stepper .step'), function (li) {
       var step = Number(li.getAttribute('data-step'));
       li.classList.toggle('is-active', step === n);
@@ -587,13 +598,15 @@
     $('regen-plan').addEventListener('click', function () { generatePlan(); });
     $('copy-plan').addEventListener('click', copyPlan);
 
-    // stepper is clickable (back to any completed step, forward if allowed)
+    // stepper is clickable: steps 1 & 2 live on the calc screen, step 3 is the plan
     Array.prototype.forEach.call(document.querySelectorAll('.stepper .step'), function (li) {
-      li.addEventListener('click', function () { goToScreen(Number(li.getAttribute('data-step'))); });
+      li.addEventListener('click', function () {
+        goToScreen(Number(li.getAttribute('data-step')) === 3 ? 2 : 1);
+      });
     });
 
     update();
-    updateStepper(1);
+    updateStepper();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

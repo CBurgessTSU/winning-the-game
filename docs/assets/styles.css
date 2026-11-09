@@ -208,7 +208,8 @@ input{font-family:inherit}
 }
 .step-label{font-size:13px;font-weight:600;color:var(--mu)}
 .step.is-active .step-label,.step.is-done .step-label{color:var(--tx)}
-.step.is-done .step-num{background:var(--emer-tint);border-color:var(--emer-line);color:var(--emer-ink)}
+.step.is-done .step-num{background:var(--emer);border-color:var(--emer);color:#fff;font-size:0}
+.step.is-done .step-num::before{content:'✓';font-size:14px;font-weight:700;line-height:1}
 .step.is-active .step-num{background:var(--grad);color:#fff;border:none}
 /* connector between steps */
 .step:not(:last-child)::after{
