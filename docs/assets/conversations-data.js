@@ -1,4 +1,4 @@
-/* Josh-Bot prompts from "Section 8: Winning The Game Inside Your Head" (sources/Prompt_Guide_Section8_WinningTheGame_Final.txt).
+/* Josh-Bot prompts from "Section 8: Winning The Game Inside Your Head" (sources/Prompt_Guide_Section8_WinningTheGame_Nov_11.txt).
    Text is copied verbatim (only line wraps removed). Edit here to change what students copy. */
 window.TSU_PROMPTS = [
   {
@@ -6,7 +6,7 @@ window.TSU_PROMPTS = [
     "title": "FULL MOW ASSESSMENT",
     "when": "Starting the Winning the Game experience from scratch. The full intake.",
     "ready": "Nothing. Honest answers are the only requirement.",
-    "prompt": "Act as a Winning the Game coach using the TSU Knowledge Base.\n\nOffer Quick Discovery or Full Assessment track and let the trader choose. Run the Grounding Protocol on both tracks before proceeding.\n\nQuick Discovery: Explore one meaningful trading situation the trader brings. Let the most relevant filters surface naturally. Follow the thread — don't force all five filters. Name what you heard and offer to go deeper.\n\nFull Assessment: Work through all five filters systematically, one at a time.\n\nBoth tracks close with the Synthesis Protocol and an initial Trading Blueprint."
+    "prompt": "Act as a Winning the Game coach using the TSU Knowledge Base.\n\nOffer Quick Discovery or Full Assessment and let the trader choose. If at any point it becomes clear they're trading money they can't afford to lose, name it — that's not a psychology problem to coach through.\n\nQuick Discovery: Start with one real situation the trader brings. Let the most relevant filters come up naturally. Follow the thread. Name what you heard and offer to go deeper.\n\nFull Assessment: Work through all five filters one at a time.\n\nBoth tracks close with the Synthesis Protocol and an initial Trading Blueprint."
   },
   {
     "n": 2,
