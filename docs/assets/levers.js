@@ -23,19 +23,22 @@
   }
 
   /* ---------- state (kept separately per mode) ---------- */
-  function blankInputs() { return { trades: '', value: '', wins: '', winReturn: '', lossReturn: '', commissions: '' }; }
-  function blankTargets() { return { trades: '', wins: '', win: '', loss: '' }; }
+  // Every field starts empty; the greyed suggestions come from HINTS below.
+  function blankInputs() { return { trades: '', value: '', wins: '', winReturn: '', lossReturn: '' }; }
+  // trades = extra trades, winPct = win-rate change in points, win/loss = change in avg winner / avg loss
+  function blankTargets() { return { trades: '', wins: '', winPct: '', win: '', loss: '' }; }
   var data = {
+    dollars: { inputs: blankInputs(), targets: blankTargets() },
     percent: { inputs: blankInputs(), targets: blankTargets() },
     r: { inputs: blankInputs(), targets: blankTargets() }
   };
-  var mode = 'r';
+  var mode = 'dollars';
   var commitments = {};   // keyed by lever name, so recalcs don't lose typed text
   var lastPlan = null;    // last AI response (or fallback marker)
   var lastPlanSig = null; // signature of inputs the current plan was built from
 
-  var inEls = { trades: 'in-trades', value: 'in-value', wins: 'in-wins', winReturn: 'in-win-return', lossReturn: 'in-loss-return', commissions: 'in-commissions' };
-  var tgEls = { trades: 'tg-trades', wins: 'tg-wins', win: 'tg-win', loss: 'tg-loss' };
+  var inEls = { trades: 'in-trades', value: 'in-value', wins: 'in-wins', winReturn: 'in-win-return', lossReturn: 'in-loss-return' };
+  var tgEls = { trades: 'tg-trades', wins: 'tg-wins', winPct: 'tg-winpct', win: 'tg-win', loss: 'tg-loss' };
 
   /* ---------- helpers ---------- */
   function num(v) { if (v === '' || v === null || v === undefined) return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
@@ -52,7 +55,7 @@
   // Returns a computed baseline object, or null if required inputs are missing.
   function computeBaseline(m, i) {
     var trades = num(i.trades), value = num(i.value), wins = num(i.wins),
-      wr = num(i.winReturn), lr = num(i.lossReturn), comm = num(i.commissions) || 0;
+      wr = num(i.winReturn), lr = num(i.lossReturn);
     if (trades === null || trades <= 0) return null;
     if (value === null || value <= 0) return null;
     if (wins === null || wins < 0 || wins > trades) return null;
@@ -66,8 +69,13 @@
     if (m === 'percent') {
       winTotal = wins * (wr / 100 * value);
       lossTotal = losses * (lr / 100 * value);
-      profit = winTotal - lossTotal - comm;
+      profit = winTotal - lossTotal;
       roi = profit / (trades * value) * 100;
+    } else if (m === 'dollars') {
+      winTotal = wins * wr;
+      lossTotal = losses * lr;
+      profit = winTotal - lossTotal;
+      totalR = profit / value;
     } else {
       winTotal = wins * (wr * value);
       lossTotal = losses * (lr * value);
@@ -75,16 +83,26 @@
       totalR = profit / value;
     }
     return { trades: trades, value: value, wins: wins, losses: losses, winReturn: wr, lossReturn: lr,
-      commissions: comm, winPct: winPct, lossPct: lossPct, winTotal: winTotal, lossTotal: lossTotal,
+      winPct: winPct, lossPct: lossPct, winTotal: winTotal, lossTotal: lossTotal,
       profit: profit, roi: roi, totalR: totalR };
   }
 
   // Applies targets (deltas) to a baseline. Returns projected object or null.
   function computeProjected(m, base, t) {
     if (!base) return null;
-    var dTrades = num(t.trades) || 0, dWins = num(t.wins) || 0, dWin = num(t.win) || 0, dLoss = num(t.loss) || 0;
+    var dTrades = num(t.trades) || 0, dWins = num(t.wins) || 0, dWinPct = num(t.winPct) || 0, dWin = num(t.win) || 0, dLoss = num(t.loss) || 0;
     var newTrades = clamp(Math.round(base.trades + dTrades), 1, 100000);
-    var newWins = clamp(Math.round(base.wins + dWins), 0, newTrades);
+    // New trades keep the current win rate (5 new trades at 60% = 3 wins, 2 losses),
+    // rounded in favour of winners. The win target is either extra wins (#) or
+    // extra win-rate points (%), depending on the toggle — only one is ever set.
+    var newWins;
+    if (dWinPct !== 0) {
+      newWins = Math.round(newTrades * clamp(base.winPct + dWinPct, 0, 100) / 100);
+    } else {
+      newWins = base.wins + Math.round(dTrades * base.winPct / 100) + dWins;
+    }
+    newWins = clamp(newWins, 0, newTrades);
+    var newWinPct = newWins / newTrades * 100;
     var newLosses = newTrades - newWins;
     var newWr = Math.max(0, base.winReturn + dWin);
     var newLr = Math.max(0, base.lossReturn + dLoss);
@@ -93,24 +111,36 @@
     if (m === 'percent') {
       winTotal = newWins * (newWr / 100 * base.value);
       lossTotal = newLosses * (newLr / 100 * base.value);
-      profit = winTotal - lossTotal - base.commissions;
+      profit = winTotal - lossTotal;
       roi = profit / (newTrades * base.value) * 100;
+    } else if (m === 'dollars') {
+      winTotal = newWins * newWr;
+      lossTotal = newLosses * newLr;
+      profit = winTotal - lossTotal;
+      totalR = profit / base.value;
     } else {
       winTotal = newWins * (newWr * base.value);
       lossTotal = newLosses * (newLr * base.value);
       profit = winTotal - lossTotal;
       totalR = profit / base.value;
     }
-    return { trades: newTrades, value: base.value, commissions: base.commissions,
+    return { trades: newTrades, value: base.value,
       wins: newWins, losses: newLosses, winReturn: newWr, lossReturn: newLr,
       winTotal: winTotal, lossTotal: lossTotal,
-      winPct: newWins / newTrades * 100, profit: profit, roi: roi, totalR: totalR };
+      winPct: newWinPct, profit: profit, roi: roi, totalR: totalR };
   }
 
   function hasAnyTarget(t) {
-    return [t.trades, t.wins, t.win, t.loss].some(function (v) { var n = num(v); return n !== null && n !== 0; });
+    return [t.trades, t.wins, t.winPct, t.win, t.loss].some(function (v) { var n = num(v); return n !== null && n !== 0; });
   }
-  function fmtUnit(v, unit) { if (v === null || v === undefined) return '—'; var n = Math.round(v * 10) / 10; return (unit === 'R') ? n.toFixed(1) + 'R' : n + '%'; }
+  function fmtUnit(v, unit) {
+    if (v === null || v === undefined) return '—';
+    if (unit === '$') return money(v);
+    var n = Math.round(v * 10) / 10;
+    return (unit === 'R') ? n.toFixed(1) + 'R' : n + '%';
+  }
+  function unitFor(m) { return m === 'percent' ? '%' : (m === 'dollars' ? '$' : 'R'); }
+  function fmtCount(n) { return String(Math.round(n * 10) / 10); }
 
   /* ---------- read / write fields <-> state ---------- */
   function readFields() {
@@ -143,21 +173,23 @@
     var d = data[mode];
     var base = computeBaseline(mode, d.inputs);
     var proj = base ? computeProjected(mode, base, d.targets) : null;
-    var secLabel = mode === 'percent' ? 'ROI' : 'Total R';
     var secOf = function (o) { return o ? (mode === 'percent' ? pct(o.roi) : rMult(o.totalR)) : '—'; };
-    var unit = mode === 'percent' ? '%' : 'R';
+    var unit = unitFor(mode);
 
     /* — Step 1: loss warning (R mode only) — */
     var lrVal = num(d.inputs.lossReturn);
     $('loss-warn').hidden = !(mode === 'r' && lrVal !== null && lrVal > 1.2);
 
     /* — Step 1: inline result cells in the metrics table — */
-    setTxt('out-losses', base ? String(base.losses) : '—');
-    setTxt('out-winpct', base ? pct(base.winPct, 0) : '—');
-    setTxt('out-losspct', base ? pct(base.lossPct, 0) : '—');
+    // Losses and the win/loss split fill in as soon as trades + wins are known —
+    // they don't wait for the dollar fields.
+    var tN = num(d.inputs.trades), wN = num(d.inputs.wins);
+    var split = (tN !== null && tN > 0 && wN !== null && wN >= 0 && wN <= tN) ? { l: tN - wN, w: wN / tN * 100 } : null;
+    setTxt('out-losses', split ? String(split.l) : '—');
+    setTxt('out-winpct', split ? pct(split.w, 0) : '—');
+    setTxt('out-losspct', split ? pct(100 - split.w, 0) : '—');
     setTxt('r-win', base ? money(base.winTotal) : '—');
     setTxt('r-loss', base ? money(base.lossTotal) : '—');
-    setTxt('r-comm', (base && base.commissions > 0) ? money(base.commissions / base.trades) + '/t' : '—');
 
     /* — Unlock the Improve + Projected columns once the Current column is valid — */
     var tri = $('triptych');
@@ -171,18 +203,16 @@
     /* — Projected column (Current column shows the live inputs themselves) — */
     setTxt('proj-trades', proj ? String(proj.trades) : '—');
     setTxt('proj-value', proj ? money(proj.value) : '—');
-    setTxt('proj-wins', proj ? String(proj.wins) : '—');
+    setTxt('proj-wins', proj ? fmtCount(proj.wins) : '—');
     setTxt('proj-winpct', proj ? pct(proj.winPct, 0) : '—');
-    setTxt('proj-losses', proj ? String(proj.losses) : '—');
+    setTxt('proj-losses', proj ? fmtCount(proj.losses) : '—');
     setTxt('proj-losspct', proj ? pct(100 - proj.winPct, 0) : '—');
     setTxt('proj-winret', proj ? money(proj.winTotal) : '—');
     setTxt('proj-winret-sec', proj ? fmtUnit(proj.winReturn, unit) : '—');
     setTxt('proj-lossret', proj ? money(proj.lossTotal) : '—');
     setTxt('proj-lossret-sec', proj ? fmtUnit(proj.lossReturn, unit) : '—');
-    setTxt('proj-comm', proj ? money(proj.commissions) : '—');
-    setTxt('proj-comm-sec', (proj && proj.commissions > 0) ? money(proj.commissions / proj.trades) + '/t' : '—');
     // CENTER · losses are derived (trades − wins), so show how the count moves
-    var lossDelta = (base && proj) ? (proj.losses - base.losses) : null;
+    var lossDelta = (base && proj) ? (Math.round((proj.losses - base.losses) * 10) / 10) : null;
     setTxt('imp-lossrate', (lossDelta !== null && lossDelta !== 0)
       ? (signNum(lossDelta) + (Math.abs(lossDelta) === 1 ? ' loss' : ' losses')) : '—');
 
@@ -277,12 +307,12 @@
     var base = computeBaseline(mode, d.inputs);
     var proj = computeProjected(mode, base, d.targets);
     if (!base || !proj) return [];
-    var unit = mode === 'percent' ? '%' : 'R';
+    var unit = unitFor(mode);
     var out = [];
     function add(cond, name, cur, tgt) { if (cond) out.push({ lever: name, currentValue: cur, targetValue: tgt }); }
     // add() already guards on a non-zero/non-null delta, so out holds only targeted levers
     add(num(d.targets.trades), 'Number of Trades', String(base.trades), String(proj.trades));
-    add(num(d.targets.wins), 'Number of Wins', String(base.wins), String(proj.wins));
+    add((num(d.targets.wins) || 0) + (num(d.targets.winPct) || 0), 'Win Rate', pct(base.winPct, 0), pct(proj.winPct, 0));
     add(num(d.targets.win), 'Average Winner', fmtUnit(base.winReturn, unit), fmtUnit(proj.winReturn, unit));
     add(num(d.targets.loss), 'Average Loss', fmtUnit(base.lossReturn, unit), fmtUnit(proj.lossReturn, unit));
     return out;
@@ -296,9 +326,9 @@
     var levers = targetedLevers();
     var curP = base.profit, projP = proj.profit;
     var impPct = curP > 0 ? Math.round((projP - curP) / Math.abs(curP) * 100) : null;
-    var unit = mode === 'percent' ? '%' : 'R';
+    var unit = unitFor(mode);
     return {
-      mode: mode === 'percent' ? 'percent' : 'r-values',
+      mode: mode === 'percent' ? 'percent' : (mode === 'dollars' ? 'dollars' : 'r-values'),
       current: {
         trades: base.trades,
         winPct: Math.round(base.winPct),
@@ -474,6 +504,18 @@
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
 
+  /* ---------- suggested numbers (greyed placeholders) per mode ---------- */
+  var HINTS = {
+    dollars: { value: '250',   win: '375', loss: '250', tWin: '+125', tLoss: '0' },
+    r:       { value: '250',   win: '1.5', loss: '1',   tWin: '+0.5', tLoss: '0' },
+    percent: { value: '2,500', win: '15',  loss: '10',  tWin: '+5',   tLoss: '0' }
+  };
+  function applyHints() {
+    var h = HINTS[mode];
+    var map = { 'in-value': h.value, 'in-win-return': h.win, 'in-loss-return': h.loss };
+    Object.keys(map).forEach(function (id) { var el = $(id); if (el) el.placeholder = map[id]; });
+  }
+
   /* ---------- mode switch ---------- */
   function setMode(next) {
     if (next === mode) return;
@@ -481,11 +523,12 @@
     mode = next;
     document.body.setAttribute('data-mode', mode);
     Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
-      var active = b.getAttribute('data-mode') === (mode === 'r' ? 'r' : 'percent');
+      var active = b.getAttribute('data-mode') === mode;
       b.classList.toggle('is-active', active);
       b.setAttribute('aria-checked', active ? 'true' : 'false');
     });
     writeFields();             // load next mode's values
+    applyHints();
     update();
   }
 
@@ -582,14 +625,43 @@
     }, 250);
   }
 
+  /* ---------- Improve column: − / + buttons and the wins # / % toggle ---------- */
+  function stepSize(id) {
+    if (id === 'tg-win' || id === 'tg-loss') return mode === 'dollars' ? 25 : (mode === 'r' ? 0.25 : 1);
+    return 1;
+  }
+  function stepField(id, dir) {
+    var el = $(id); if (!el) return;
+    var v = Math.round(((num(el.value) || 0) + dir * stepSize(id)) * 100) / 100;
+    if (id === 'tit-target') v = Math.max(0, v);
+    el.value = String(v);
+    update();
+  }
+  function setWinMeasure(kind) {     // 'num' = number of wins, 'pct' = win-rate points
+    var toPct = kind === 'pct';
+    $('pill-wins-num').hidden = toPct;
+    $('pill-wins-pct').hidden = !toPct;
+    $('tg-wins').value = ''; $('tg-winpct').value = '';   // never keep both targets at once
+    update();
+  }
+
   /* ---------- wiring ---------- */
   function init() {
     document.body.setAttribute('data-mode', mode);
+    applyHints();
+    writeFields();   // load the starting values (e.g. $250 R, 1R loss) into the form
 
     watchFields();
 
+    Array.prototype.forEach.call(document.querySelectorAll('.imp-step'), function (b) {
+      b.addEventListener('click', function () { stepField(b.getAttribute('data-target'), Number(b.getAttribute('data-dir'))); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-wintoggle]'), function (b) {
+      b.addEventListener('click', function () { setWinMeasure(b.getAttribute('data-wintoggle')); });
+    });
+
     Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
-      b.addEventListener('click', function () { setMode(b.getAttribute('data-mode') === 'r' ? 'r' : 'percent'); });
+      b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); });
     });
 
     // wizard buttons (2 screens: 1 = calculator, 2 = plan)

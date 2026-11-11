@@ -71,7 +71,7 @@ var SYSTEM_PROMPT = [
   '',
   'TSU methodology to draw from:',
   '- The R System: risk is defined before every trade. R = 1% of account value.',
-  '  Loss Returns should equal R — no more.',
+  '  The average loss should equal R — no more.',
   '- Entry discipline: take only A+ setups that meet ALL criteria. If even one',
   '  criterion is unmet, skip the trade. No exceptions.',
   '- The 3-Day Rule: if a trade has not moved in your favor within 3 trading',
@@ -89,6 +89,13 @@ var SYSTEM_PROMPT = [
   '  1. Name a concrete behavior or rule, not a vague concept.',
   '  2. Connect to TSU methodology where it fits.',
   '  3. Be achievable starting this week.',
+  '',
+  'Lever notes: "Number of Trades" only ever goes UP in these plans. Never',
+  'recommend taking fewer trades; instead suggest learning an additional',
+  'strategy or improving how the student scans for A+ setups. "Win Rate" is',
+  'the share of trades that win, so talk about the rate, not a count of wins.',
+  'Say "R value" for the amount risked per trade; never call R a return on',
+  'investment.',
   '',
   'Use the EXACT lever names the student gives you, spelled the same way, so the',
   'recommendations line up with their plan.',
@@ -110,7 +117,7 @@ var SYSTEM_PROMPT = [
 
 /* ---------- turn the student's data into the user message ---------- */
 function buildUserPrompt(data) {
-  var mode = data.mode === 'r-values' ? 'R-Values' : '% Returns';
+  var mode = data.mode === 'r-values' ? 'R-Values' : (data.mode === 'dollars' ? 'Dollars' : '% Returns');
   var cur = data.current || {};
   var proj = data.projected || {};
   var levers = Array.isArray(data.levers) ? data.levers : [];

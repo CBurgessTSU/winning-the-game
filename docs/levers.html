@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/styles.css">
 </head>
-<body data-mode="r">
+<body data-mode="dollars">
 
 <!-- ═══════════════════════ HEADER / NAV ═══════════════════════ -->
 <header class="site-header">
@@ -79,7 +79,8 @@
         </ol>
 
         <div class="mode-toggle" id="mode-toggle" role="radiogroup" aria-label="Calculation mode">
-          <button class="mode-btn is-active" data-mode="r" role="radio" aria-checked="true">R-Values</button>
+          <button class="mode-btn is-active" data-mode="dollars" role="radio" aria-checked="true">Dollars</button>
+          <button class="mode-btn" data-mode="r" role="radio" aria-checked="false">R-Values</button>
           <button class="mode-btn" data-mode="percent" role="radio" aria-checked="false">% Returns</button>
         </div>
       </div>
@@ -89,7 +90,6 @@
         <div class="calc-card">
           <div class="calc-card-head">
             <h3 id="screen-calc-h">Your numbers</h3>
-            <p class="calc-card-sub">Fill in the <strong>Current</strong> column from your last 10–20 trades. The moment it's valid, the <strong>Improve</strong> and <strong>Projected</strong> columns unlock — nudge one lever and watch the result.</p>
           </div>
 
           <!-- Three-panel: CURRENT (editable) | IMPROVE | PROJECTED -->
@@ -101,19 +101,19 @@
 
               <div class="tri-row">
                 <span class="tri-name">Number of Trades</span>
-                <span class="tri-in"><input type="number" id="in-trades" inputmode="numeric" min="0" step="1" placeholder="16" aria-label="Number of trades"></span>
+                <span class="tri-in"><input type="number" id="in-trades" inputmode="numeric" min="0" step="1" placeholder="10" aria-label="Number of trades"></span>
                 <span class="tri-sec">&nbsp;</span>
               </div>
 
               <div class="tri-row" data-mode-field="value">
-                <span class="tri-name"><span class="lbl-percent">Avg Trade Value</span><span class="lbl-r">Your R</span></span>
-                <span class="tri-in has-prefix"><span class="tri-affix">$</span><input type="number" id="in-value" inputmode="decimal" min="0" step="any" placeholder="1,000" aria-label="Average trade value"></span>
+                <span class="tri-name"><span class="lbl-percent">Avg Trade Value</span><span class="lbl-r lbl-dollars">Your R</span></span>
+                <span class="tri-in has-prefix"><span class="tri-affix">$</span><input type="number" id="in-value" inputmode="decimal" min="0" step="any" placeholder="250" aria-label="Average trade value"></span>
                 <span class="tri-sec">&nbsp;</span>
               </div>
 
               <div class="tri-row tri-win">
                 <span class="tri-name">Wins #</span>
-                <span class="tri-in"><input type="number" id="in-wins" inputmode="numeric" min="0" step="1" placeholder="11" aria-label="Winning trades"></span>
+                <span class="tri-in"><input type="number" id="in-wins" inputmode="numeric" min="0" step="1" placeholder="7" aria-label="Winning trades"></span>
                 <span class="tri-sec tri-sec-win" id="out-winpct">—</span>
               </div>
 
@@ -124,26 +124,20 @@
               </div>
 
               <div class="tri-row" data-mode-field="win">
-                <span class="tri-name">Win Returns</span>
-                <span class="tri-in has-suffix"><input type="number" id="in-win-return" inputmode="decimal" min="0" step="any" placeholder="18" aria-label="Average winner"><span class="tri-affix lbl-percent">%</span><span class="tri-affix lbl-r">R</span></span>
+                <span class="tri-name">Win Amount</span>
+                <span class="tri-in has-suffix"><span class="tri-affix lbl-dollars">$</span><input type="number" id="in-win-return" inputmode="decimal" min="0" step="any" placeholder="375" aria-label="Average winner"><span class="tri-affix lbl-percent">%</span><span class="tri-affix lbl-r">R</span></span>
                 <span class="tri-sec" id="r-win">—</span>
               </div>
 
               <div class="tri-row" data-mode-field="loss">
-                <span class="tri-name">Loss Returns</span>
-                <span class="tri-in has-suffix"><input type="number" id="in-loss-return" inputmode="decimal" min="0" step="any" placeholder="30" aria-label="Average loss"><span class="tri-affix lbl-percent">%</span><span class="tri-affix lbl-r">R</span></span>
+                <span class="tri-name">Loss Amount</span>
+                <span class="tri-in has-suffix"><span class="tri-affix lbl-dollars">$</span><input type="number" id="in-loss-return" inputmode="decimal" min="0" step="any" placeholder="250" aria-label="Average loss"><span class="tri-affix lbl-percent">%</span><span class="tri-affix lbl-r">R</span></span>
                 <span class="tri-sec" id="r-loss">—</span>
-              </div>
-
-              <div class="tri-row" data-mode-field="commissions">
-                <span class="tri-name">Commissions</span>
-                <span class="tri-in has-prefix"><span class="tri-affix">$</span><input type="number" id="in-commissions" inputmode="decimal" min="0" step="any" placeholder="96" aria-label="Commissions"></span>
-                <span class="tri-sec" id="r-comm">—</span>
               </div>
 
               <div class="tri-row tri-row-tit">
                 <span class="tri-name">Avg Days in Trade <span class="tri-opt">optional</span></span>
-                <span class="tri-in has-suffix"><input type="number" id="tit-current" inputmode="decimal" min="0" step="any" placeholder="8" aria-label="Current average days in a trade"><span class="tri-affix">d</span></span>
+                <span class="tri-in has-suffix"><input type="number" id="tit-current" inputmode="decimal" min="0" step="any" placeholder="5" aria-label="Current average days in a trade"><span class="tri-affix">d</span></span>
                 <span class="tri-sec">&nbsp;</span>
               </div>
             </div>
@@ -155,22 +149,22 @@
               <div class="tri-col tri-improve">
                 <div class="tri-head">Improve</div>
                 <div class="imp-cell">
-                  <span class="imp-pill"><input type="number" id="tg-trades" inputmode="numeric" step="1" placeholder="-1" aria-label="Change to number of trades"></span>
+                  <span class="imp-pill"><button type="button" class="imp-step" data-target="tg-trades" data-dir="-1" aria-label="Decrease extra trades">−</button><input type="number" id="tg-trades" inputmode="decimal" step="any" aria-label="extra trades"><button type="button" class="imp-step" data-target="tg-trades" data-dir="1" aria-label="Increase extra trades">+</button></span>
                 </div>
                 <div class="imp-cell"><span class="imp-dash" aria-hidden="true">—</span></div>
                 <div class="imp-cell">
-                  <span class="imp-pill"><input type="number" id="tg-wins" inputmode="numeric" step="1" placeholder="+1" aria-label="Wins to add"><span class="imp-unit">wins</span></span>
+                  <span class="imp-pill" id="pill-wins-num"><button type="button" class="imp-step" data-target="tg-wins" data-dir="-1" aria-label="Decrease extra wins">−</button><input type="number" id="tg-wins" inputmode="decimal" step="any" aria-label="extra wins"><button type="button" class="imp-step" data-target="tg-wins" data-dir="1" aria-label="Increase extra wins">+</button><button type="button" class="imp-unit imp-toggle" data-wintoggle="pct" title="Switch to win-rate % points" aria-label="Measuring in number of wins. Switch to percent points.">wins</button></span>
+                  <span class="imp-pill" id="pill-wins-pct" hidden><button type="button" class="imp-step" data-target="tg-winpct" data-dir="-1" aria-label="Decrease win rate, in percent points">−</button><input type="number" id="tg-winpct" inputmode="decimal" step="any" aria-label="win rate, in percent points"><button type="button" class="imp-step" data-target="tg-winpct" data-dir="1" aria-label="Increase win rate, in percent points">+</button><button type="button" class="imp-unit imp-toggle" data-wintoggle="num" title="Switch to number of wins" aria-label="Measuring in percent points. Switch to number of wins.">% pts</button></span>
                 </div>
                 <div class="imp-cell"><span class="imp-derived" id="imp-lossrate" aria-hidden="true">—</span></div>
                 <div class="imp-cell">
-                  <span class="imp-pill"><input type="number" id="tg-win" inputmode="decimal" step="any" placeholder="+6" aria-label="Change to average winner"><span class="imp-unit lbl-percent">%</span><span class="imp-unit lbl-r">R</span></span>
+                  <span class="imp-pill"><button type="button" class="imp-step" data-target="tg-win" data-dir="-1" aria-label="Decrease average win amount">−</button><input type="number" id="tg-win" inputmode="decimal" step="any" aria-label="average win amount"><button type="button" class="imp-step" data-target="tg-win" data-dir="1" aria-label="Increase average win amount">+</button><span class="imp-unit lbl-percent">%</span><span class="imp-unit lbl-r">R</span><span class="imp-unit lbl-dollars">$</span></span>
                 </div>
                 <div class="imp-cell">
-                  <span class="imp-pill"><input type="number" id="tg-loss" inputmode="decimal" step="any" placeholder="-5" aria-label="Change to average loss"><span class="imp-unit lbl-percent">%</span><span class="imp-unit lbl-r">R</span></span>
+                  <span class="imp-pill"><button type="button" class="imp-step" data-target="tg-loss" data-dir="-1" aria-label="Decrease average loss amount">−</button><input type="number" id="tg-loss" inputmode="decimal" step="any" aria-label="average loss amount"><button type="button" class="imp-step" data-target="tg-loss" data-dir="1" aria-label="Increase average loss amount">+</button><span class="imp-unit lbl-percent">%</span><span class="imp-unit lbl-r">R</span><span class="imp-unit lbl-dollars">$</span></span>
                 </div>
-                <div class="imp-cell" data-mode-field="commissions"><span class="imp-dash" aria-hidden="true">—</span></div>
                 <div class="imp-cell imp-cell-tit">
-                  <span class="imp-pill"><input type="number" id="tit-target" inputmode="decimal" min="0" step="any" placeholder="4" aria-label="Target average days in a trade"><span class="imp-unit">d</span></span>
+                  <span class="imp-pill"><button type="button" class="imp-step" data-target="tit-target" data-dir="-1" aria-label="Decrease target average days in a trade">−</button><input type="number" id="tit-target" inputmode="decimal" step="any" aria-label="target average days in a trade" min="0"><button type="button" class="imp-step" data-target="tit-target" data-dir="1" aria-label="Increase target average days in a trade">+</button><span class="imp-unit">d</span></span>
                 </div>
               </div>
 
@@ -181,9 +175,8 @@
                 <div class="tri-row"><span class="tri-name">Avg Trade Value</span><span class="tri-val" id="proj-value">—</span><span class="tri-sec">&nbsp;</span></div>
                 <div class="tri-row tri-win"><span class="tri-name">Wins #</span><span class="tri-val" id="proj-wins">—</span><span class="tri-sec tri-sec-up" id="proj-winpct">—</span></div>
                 <div class="tri-row tri-win"><span class="tri-name">Losses #</span><span class="tri-val" id="proj-losses">—</span><span class="tri-sec tri-sec-up" id="proj-losspct">—</span></div>
-                <div class="tri-row"><span class="tri-name">Win Returns</span><span class="tri-val" id="proj-winret">—</span><span class="tri-sec" id="proj-winret-sec">—</span></div>
-                <div class="tri-row"><span class="tri-name">Loss Returns</span><span class="tri-val" id="proj-lossret">—</span><span class="tri-sec" id="proj-lossret-sec">—</span></div>
-                <div class="tri-row" data-mode-field="commissions"><span class="tri-name">Commissions</span><span class="tri-val" id="proj-comm">—</span><span class="tri-sec" id="proj-comm-sec">—</span></div>
+                <div class="tri-row"><span class="tri-name">Win Amount</span><span class="tri-val" id="proj-winret">—</span><span class="tri-sec" id="proj-winret-sec">—</span></div>
+                <div class="tri-row"><span class="tri-name">Loss Amount</span><span class="tri-val" id="proj-lossret">—</span><span class="tri-sec" id="proj-lossret-sec">—</span></div>
                 <div class="tri-row tri-row-tit"><span class="tri-name">Capital Recycled</span><span class="tri-val" id="tit-throughput">—</span><span class="tri-sec">&nbsp;</span></div>
               </div>
 
@@ -211,7 +204,7 @@
             <span class="wb-label">Before</span>
             <div class="wb-figs">
               <div class="wb-fig"><span class="wb-k">Profit</span><span class="wb-v" id="s2-current-profit">—</span></div>
-              <div class="wb-fig"><span class="wb-k">ROI</span><span class="wb-v wb-v-sm" id="s2-current-roi">—</span></div>
+              <div class="wb-fig"><span class="wb-k">R’s Value</span><span class="wb-v wb-v-sm" id="s2-current-roi">—</span></div>
             </div>
           </div>
           <div class="wb-arrow" aria-hidden="true">→</div>
@@ -225,7 +218,7 @@
             <span class="wb-label">After</span>
             <div class="wb-figs">
               <div class="wb-fig"><span class="wb-k">Profit</span><span class="wb-v wb-v-up" id="s2-projected-profit">—</span></div>
-              <div class="wb-fig"><span class="wb-k">ROI</span><span class="wb-v wb-v-up wb-v-sm" id="s2-projected-roi">—</span></div>
+              <div class="wb-fig"><span class="wb-k">R’s Value</span><span class="wb-v wb-v-up wb-v-sm" id="s2-projected-roi">—</span></div>
             </div>
           </div>
           </div>
@@ -253,12 +246,11 @@
             <div class="calc-card circle-of-progress" id="circle-of-progress">
               <div class="calc-card-head">
                 <h3 id="screen-plan-h">Circle of Progress</h3>
-                <p class="calc-card-sub">You are here: the Plan stage.</p>
               </div>
               <div class="cop-graphic" id="cop-graphic" aria-hidden="true"></div>
               <div class="cop-note">
-                <p class="cop-line">You've <strong>measured</strong> your baseline and set your <strong>goal</strong>. Now build the <strong>plan</strong> to get there.</p>
-                <p class="cop-sub">This isn't a one-time exercise. Trade the plan, measure again, and correct — the loop is the work.</p>
+                <p class="cop-line">You've <strong>measured</strong> your baseline and set your <strong>goal</strong>. Now build the <strong>plan</strong> to get&nbsp;there.</p>
+                <p class="cop-sub">This isn't a one-time exercise. Trade the plan, measure again, and correct — the loop is the&nbsp;work.</p>
               </div>
             </div>
           </aside>
