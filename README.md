@@ -7,7 +7,7 @@ A single-page microsite hosting custom tools for a TradeSmart University class:
    Josh-Bot (https://joshbot.tradesmartu.com): the Mindset Assessment is the
    "Start here" card, followed by ten more prompts. Students copy a prompt and
    paste it into Josh-Bot. The prompts live in `docs/assets/conversations-data.js`
-   (copied from `sources/Prompt_Guide_Section8_WinningTheGame_Nov_12.txt`).
+   (copied from `sources/Prompt_Guide_WinningTheGame_Nov_12_2.txt`).
    `/mindset` redirects to `/conversations`.
 
 The site is plain HTML/CSS/JavaScript — no build step, no frameworks, nothing to
